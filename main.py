@@ -16,7 +16,7 @@ game_title_font = pygame.font.Font(os.path.join("assets", "font", "Bitmgothic.tt
 button_font = pygame.font.Font(os.path.join("assets", "font", "Bitmgothic.ttf"), 90)
 select_title_font = pygame.font.Font(os.path.join("assets", "font", "Bitmgothic.ttf"), 100)
 select_button_font = pygame.font.Font(os.path.join("assets", "font", "Bitmgothic.ttf"), 50)
-ch_info_font = pygame.font.Font(os.path.join("assets", "font", "Bitmgothic.ttf"), 30)
+#ch_info_font = pygame.font.Font(os.path.join("assets", "font", "Bitmgothic.ttf"), 30)
 # Sounds
 button_hover_sound = pygame.mixer.Sound(os.path.join("assets", "snd", "hover.wav"))
 title_screen_intro = pygame.mixer.music.load("assets/snd/intro.wav")
@@ -36,7 +36,7 @@ game_title_text = game_title_font.render("Era of Conflict", True, (180, 150, 100
 game_title_rect = game_title_text.get_rect(center=(width // 2, height // 1.08))
 
 # Set up main menu border rectangle
-border_rect = border.get_rect(center=(width // 2, height // 7))
+border_rect = border.get_rect(center=(width // 2, height // 6.5))
 
 # Set up play button
 play_button_text = button_font.render("PLAY", True, (180, 150, 100))
@@ -224,23 +224,28 @@ def char_select(set_n):
         screen.blit(character_text, character_rect)
 
         scaled_sprite = pygame.transform.scale(sprite, (100, 100))
-        screen.blit(scaled_sprite, (260, 200))
-        pname = ch_info_font.render("NameEX", True, (0, 0, 255))
-        pname_rect = pname.get_rect(center=(width // 5, height // 2.75))
+        screen.blit(scaled_sprite, (width // 6, height // 2.6))
+        pname = ch_info_font.render("NameEX", True, (220, 220, 160))
+        pname_rect = pname.get_rect(center=(width // 5, height // 1.9))
 
-        cname = ch_info_font.render("Class", True, (0, 0, 255))
-        cname_rect = cname.get_rect(center=(width // 5, height // 2.5))
+        cname = ch_info_font.render("Class", True, (220, 220, 160))
+        cname_rect = cname.get_rect(center=(width // 5, height // 1.75))
+
+        ch_box = pygame.draw.rect(screen, (220, 220, 160), (width // 6.6,height // 2.7,150,200),2)
+        ch_box_hovered = ch_box
+
+        select_character = ch_info_font.render("Select", True, (220, 220, 160))
+        select_character_rect = pname.get_rect(center=(width // 4.7, height // 1.55))
 
         screen.blit(pname, pname_rect)
         screen.blit(cname, cname_rect)
+        screen.blit(select_character, select_character_rect)
 
-        ch_box = pygame.draw.rect(screen, (0, 0, 255), (width // 6.5,height // 4.5,140,175),2)
-        ch_box_hovered = ch_box
         # Draw back button
         if back2_rect.collidepoint(pygame.mouse.get_pos()):
             back2_text_hovered = select_button_font.render("CHANGE FACTION", True, (255, 0, 0))
         elif ch_box.collidepoint(pygame.mouse.get_pos()):
-            ch_box_hovered = pygame.draw.rect(screen, (255, 0, 0), (width // 6.5,height // 4.5,140,175),2)
+            ch_box_hovered = pygame.draw.rect(screen, (255, 0, 0), (width // 6.6,height // 2.7,150,200),2)
         else:
             back2_text_hovered = back2_text
             ch_box_hovered = ch_box
@@ -275,12 +280,12 @@ def info_window():
         X_hovered = X       
 
         scaled_sprite = pygame.transform.scale(sprite, (200, 200))
-        screen.blit(scaled_sprite, (550, 200))
-        pname = ch_info_font.render("NameEX", True, (153, 102, 255))
-        pname_rect = pname.get_rect(center=(width // 1.75, height // 3.25))
+        screen.blit(scaled_sprite, (width // 2.75,  height // 8))
+        pname = ch_info_font.render("NameEX", True, (65, 32, 96))
+        pname_rect = pname.get_rect(center=(width // 1.85, height // 6))
         screen.blit(pname, pname_rect)
-        cname = ch_info_font.render("Class", True, (153, 102, 255))
-        cname_rect = cname.get_rect(center=(width // 1.75, height // 3))
+        cname = ch_info_font.render("Class", True, (65, 32, 96))
+        cname_rect = cname.get_rect(center=(width // 1.9, height // 4.75))
         screen.blit(cname, cname_rect)
 
         # Draw back button
