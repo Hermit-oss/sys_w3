@@ -1,299 +1,320 @@
 import pygame
-import os
 import sys
+import os
+from button import Button
 
 # Initialize Pygame
 pygame.init()
 
 # Set up the screen
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-width, height = screen.get_size()
-pygame.display.set_caption("Era of Conflict")
+SCREEN = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+WIDTH, HEIGHT = SCREEN.get_size()
 
-# Load assets
-# Fonts
-game_title_font = pygame.font.Font(os.path.join("assets", "font", "Bitmgothic.ttf"), 140)
-button_font = pygame.font.Font(os.path.join("assets", "font", "Bitmgothic.ttf"), 90)
-select_title_font = pygame.font.Font(os.path.join("assets", "font", "Bitmgothic.ttf"), 100)
-select_button_font = pygame.font.Font(os.path.join("assets", "font", "Bitmgothic.ttf"), 50)
-#ch_info_font = pygame.font.Font(os.path.join("assets", "font", "Bitmgothic.ttf"), 30)
-# Sounds
-button_hover_sound = pygame.mixer.Sound(os.path.join("assets", "snd", "hover.wav"))
-title_screen_intro = pygame.mixer.music.load("assets/snd/intro.wav")
-# Graphics
-border = pygame.transform.scale(pygame.image.load('assets/img/border.png').convert_alpha(), (width, 80))
-BG = pygame.image.load(os.path.join("assets", "img", "bgwood.jpg"))
-sprite = pygame.image.load(os.path.join("assets", "img", "tmp_char.png"))
-info_pic = pygame.image.load(os.path.join("assets", "img", "metal.png"))
-frames = []
+# Main menu background animation
+MENU_FRAMES = []
 for i in range(1, 120):
     filename = os.path.join('assets/img/background', f'frame{i}.png')
-    frame = pygame.transform.scale(pygame.image.load(filename).convert_alpha(), screen.get_size())
-    frames.append(frame)
+    frame = pygame.transform.scale(pygame.image.load(filename).convert_alpha(), SCREEN.get_size())
+    MENU_FRAMES.append(frame)
 
-# Set up game title
-game_title_text = game_title_font.render("Era of Conflict", True, (180, 150, 100))
-game_title_rect = game_title_text.get_rect(center=(width // 2, height // 1.08))
+# Colors
+MENU_BASE_COLOR = (180, 150, 100)
 
-# Set up main menu border rectangle
-border_rect = border.get_rect(center=(width // 2, height // 6.5))
-
-# Set up play button
-play_button_text = button_font.render("PLAY", True, (180, 150, 100))
-play_button_rect = play_button_text.get_rect(center=(width // 5, height // 14))
-rendered_play_button_text = play_button_text
-
-# Set up credits button
-credits_button_text = button_font.render("CREDITS", True, (180, 150, 100))
-credits_button_rect = credits_button_text.get_rect(center=(width // 2, height // 14))
-rendered_credits_button_text = credits_button_text
-
-# Set up quit button
-quit_button_text = button_font.render("QUIT", True, (180, 150, 100))
-quit_button_rect = quit_button_text.get_rect(center=(4*width // 5, height // 14))
-rendered_quit_button_text = quit_button_text
-
-# Set up back button
-back_text = button_font.render("BACK", True, (220, 220, 160))
-back_rect = quit_button_text.get_rect(center=(width // 2, height -60))
-back_text_hovered = back_text
-
+# Sounds
+BUTTON_HOVER_SOUND = pygame.mixer.Sound(os.path.join("assets", "snd", "hover.wav"))
+TITLE_SCREEN_INTRO = pygame.mixer.music.load("assets/snd/intro.wav")
 # Start playing background music
 pygame.mixer.music.play(-1, 0, 4000)
-
-
+pygame.mixer.music.set_volume(0.5)
 # Set up hover sound flag
 hover_sound_played = False
 
-# Title screen
-def main_menu():
+def getFont(size): # Returns Bitmgothic in the specified size
+    font_path = "assets/font/Bitmgothic.ttf"
+    return pygame.font.Font(font_path, size)
+
+def main_menu(): # Main menu method
+    # Set the window caption
+    pygame.display.set_caption("Era of Conflict")
+
     # Set the initial frame index and FPS
-    # LOW FRAME RATE SOMETIMES CAUSES BUTTON GLITCHES (TWO HIGHLIGHTED AT ONCE)
+    # LOW FRAME RATE SOMETIMES CAUSES BUTTON GLITCHES (SLOW COLOR CHANGE)
     frame_index = 0
-    FPS = 12
+    FPS = 24
 
     # Set up game loop
     clock = pygame.time.Clock()
-    running = True
 
-    while running:
+    while True:
+        # Get main menu mouse position
+        MENU_MOUSE_POS = pygame.mouse.get_pos()
+
+        # Draw the screen
+        SCREEN.fill((0, 0, 0))
+
+        # Get the current frame, update the index, blit the current frame
+        frame = MENU_FRAMES[frame_index]
+        frame_index = (frame_index + 1) % len(MENU_FRAMES)
+        SCREEN.blit(frame, (0, 0))
+
+        # Set up main menu border
+        MENU_BORDER = pygame.transform.scale(pygame.image.load('assets/img/border.png').convert_alpha(), (WIDTH, 80))
+        MENU_BORDER_RECT = MENU_BORDER.get_rect(center=(WIDTH // 2, HEIGHT // 7))
+        SCREEN.blit(MENU_BORDER, MENU_BORDER_RECT)
+
+        # Set up main menu text
+        MENU_TEXT = getFont(140).render("Era of Conflict", True, MENU_BASE_COLOR)
+        MENU_RECT = MENU_TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 1.06))
+        SCREEN.blit(MENU_TEXT, MENU_RECT)
+
+        # Set up main menu PLAY button
+        MENU_PLAY = Button(image=None, pos=(WIDTH // 5, HEIGHT // 16),
+                            text_input="PLAY", font=getFont(90), base_color=MENU_BASE_COLOR, hovering_color="red")
+
+        # Set up main menu CREDITS button
+        MENU_CREDITS = Button(image=None, pos=(WIDTH // 2, HEIGHT // 16),
+                            text_input="CREDITS", font=getFont(90), base_color=MENU_BASE_COLOR, hovering_color="red")
+
+        # Set up main menu QUIT button
+        MENU_QUIT = Button(image=None, pos=(4*WIDTH // 5, HEIGHT // 16),
+                            text_input="QUIT", font=getFont(90), base_color=MENU_BASE_COLOR, hovering_color="red")
+
+        # Set state and blit the buttons, play the hovering sound
+        for button in [MENU_PLAY, MENU_CREDITS, MENU_QUIT]:
+            button.changeColor(MENU_MOUSE_POS)
+            button.update(SCREEN)
+
         # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if quit_button_rect.collidepoint(pygame.mouse.get_pos()):
-                    running = False
-                if play_button_rect.collidepoint(pygame.mouse.get_pos()):
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if MENU_QUIT.checkForInput(MENU_MOUSE_POS):
+                    pygame.quit()
+                    sys.exit()
+                if MENU_PLAY.checkForInput(MENU_MOUSE_POS):
                     menu_selection()
-
-        # Draw screen
-        screen.fill((0, 0, 0))
-
-        # Get the current frame
-        frame = frames[frame_index]
-
-        # Draw background animation
-        screen.blit(frame, (0, 0))
-        screen.blit(border, border_rect)
-
-        # Update the frame index
-        frame_index = (frame_index + 1) % len(frames)
-
-        # Render red quit button text and play the hover sound
-        if quit_button_rect.collidepoint(pygame.mouse.get_pos()):
-            rendered_quit_button_text = button_font.render("QUIT", True, (255, 0, 0))
-            if not hover_sound_played:
-                button_hover_sound.play()
-                hover_sound_played = True
-        # Render red play button text and play the hover sound
-        elif play_button_rect.collidepoint(pygame.mouse.get_pos()):
-            rendered_play_button_text = button_font.render("PLAY", True, (255, 0, 0))
-            if not hover_sound_played:
-                button_hover_sound.play()
-                hover_sound_played = True
-        # Render red credits button text and play the hover sound
-        elif credits_button_rect.collidepoint(pygame.mouse.get_pos()):
-            rendered_credits_button_text = button_font.render("CREDITS", True, (255, 0, 0))
-            if not hover_sound_played:
-                button_hover_sound.play()
-                hover_sound_played = True  
-        # Return to the base color of the buttons and stop playing the hover sound
-        else:
-            rendered_quit_button_text = quit_button_text
-            rendered_play_button_text = play_button_text
-            rendered_credits_button_text = credits_button_text
-            hover_sound_played = False
-
-        # Draw game title
-        screen.blit(game_title_text, game_title_rect)
-        # Draw buttons
-        screen.blit(rendered_play_button_text, play_button_rect)
-        screen.blit(rendered_credits_button_text, credits_button_rect)
-        screen.blit(rendered_quit_button_text, quit_button_rect)
-
-        # Update display
-        pygame.display.flip()
+                if MENU_CREDITS.checkForInput(MENU_MOUSE_POS):
+                    menu_credits()
 
         # Limit the frame rate
         clock.tick(FPS)
 
-    # Stop the background music when the game is finished
-    pygame.mixer.music.stop()
+        # Update display
+        pygame.display.update()
 
-    # Quit the game
-    pygame.quit()
-
-# Menu Selection Screen
-def menu_selection():
-
+def menu_credits():
+    # Set the window caption
+    pygame.display.set_caption("Credits")
     while True:
+        # Get credits mouse position
+        CREDITS_MOUSE_POS = pygame.mouse.get_pos()
 
-        scaled_BG = pygame.transform.scale(BG, screen.get_size())
-        screen.blit(scaled_BG, (0, 0))
+        # Draw the screen
+        SCREEN.fill((0, 0, 0))
 
-        menu_text = select_title_font.render("Choose your faction:", True, (220, 220, 160))
-        menu_rect = menu_text.get_rect(center=(width // 2, height // 6))
-        screen.blit(menu_text, menu_rect)
+        # Set up credits background
+        CREDITS_BG = pygame.transform.scale(pygame.image.load("assets/img/bgwood.jpg"), SCREEN.get_size())
+        SCREEN.blit(CREDITS_BG, (0, 0))
 
+        # Set up credits text
+        CREDITS_TEXT = getFont(100).render("We're thankful to", True, MENU_BASE_COLOR)
+        CREDITS_RECT = CREDITS_TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 6))
+        SCREEN.blit(CREDITS_TEXT, CREDITS_RECT)
+
+        # Set up credits text
+        CREDITS_TEXT1 = getFont(50).render("Creators: JJEntertainment", True, MENU_BASE_COLOR)
+        CREDITS_RECT1 = CREDITS_TEXT1.get_rect(center=(WIDTH // 2, HEIGHT // 3))
+        SCREEN.blit(CREDITS_TEXT1, CREDITS_RECT1)
+
+        # Set up credits text
+        CREDITS_TEXT2 = getFont(50).render("BG Anima: Camille Unknown", True, MENU_BASE_COLOR)
+        CREDITS_RECT2 = CREDITS_TEXT2.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        SCREEN.blit(CREDITS_TEXT2, CREDITS_RECT2)
+
+        # Set up credits text
+        CREDITS_TEXT3 = getFont(50).render("BG Music: TBD...", True, MENU_BASE_COLOR)
+        CREDITS_RECT3 = CREDITS_TEXT3.get_rect(center=(WIDTH // 2, HEIGHT // 1.5))
+        SCREEN.blit(CREDITS_TEXT3, CREDITS_RECT3)
+
+        # Set up credits BACK button
+        CREDITS_BACK = Button(image=None, pos=(WIDTH // 3.5, HEIGHT // 1.06),
+                            text_input="BACK", font=getFont(90), base_color=MENU_BASE_COLOR, hovering_color="red")
+        CREDITS_BACK.changeColor(CREDITS_MOUSE_POS)
+        CREDITS_BACK.update(SCREEN)
+
+        # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if back_rect.collidepoint(pygame.mouse.get_pos()):
+                if CREDITS_BACK.checkForInput(CREDITS_MOUSE_POS):
                     main_menu()
-                if faction1_rect.collidepoint(pygame.mouse.get_pos()):
+
+        pygame.display.update()
+
+def menu_selection(): # Menu selection method
+    # Set the window caption
+    pygame.display.set_caption("Menu Selection")
+
+    while True:
+        # Get menu selection mouse position
+        MENU_SELECTION_MOUSE_POS = pygame.mouse.get_pos()
+
+        # Draw the screen
+        SCREEN.fill((0, 0, 0))
+
+        # Set up menu selection background
+        MENU_SELECTION_BG = pygame.transform.scale(pygame.image.load("assets/img/bgwood.jpg"), SCREEN.get_size())
+        SCREEN.blit(MENU_SELECTION_BG, (0, 0))
+
+        # Set up menu selection text
+        MENU_SELECTION_TEXT = getFont(100).render("Pledge your allegiance", True, MENU_BASE_COLOR)
+        MENU_SELECTION_RECT = MENU_SELECTION_TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 6))
+        SCREEN.blit(MENU_SELECTION_TEXT, MENU_SELECTION_RECT)
+
+        # Set up menu selection FACTION1 button
+        MENU_SELECTION_FACTION1 = Button(image=None, pos=(WIDTH // 2, HEIGHT // 2.25),
+                            text_input="The Crimson Legion", font=getFont(70), base_color=MENU_BASE_COLOR, hovering_color="red")
+        MENU_SELECTION_FACTION1.changeColor(MENU_SELECTION_MOUSE_POS)
+        MENU_SELECTION_FACTION1.update(SCREEN)
+
+        # Set up menu selection FACTION2 button
+        MENU_SELECTION_FACTION2 = Button(image=None, pos=(WIDTH // 2, HEIGHT // 1.75),
+                            text_input="The Mystic Conclave", font=getFont(70), base_color=MENU_BASE_COLOR, hovering_color="red")
+        MENU_SELECTION_FACTION2.changeColor(MENU_SELECTION_MOUSE_POS)
+        MENU_SELECTION_FACTION2.update(SCREEN)
+
+        # Set up menu selection BACK button
+        MENU_SELECTION_BACK = Button(image=None, pos=(WIDTH // 3.5, HEIGHT // 1.06),
+                            text_input="BACK", font=getFont(90), base_color=MENU_BASE_COLOR, hovering_color="red")
+
+        # Set state and blit the buttons, play the hovering sound
+        for button in [MENU_SELECTION_FACTION1, MENU_SELECTION_FACTION2, MENU_SELECTION_BACK]:
+            button.changeColor(MENU_SELECTION_MOUSE_POS)
+            button.update(SCREEN)
+
+        # Handle events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if MENU_SELECTION_BACK.checkForInput(MENU_SELECTION_MOUSE_POS):
+                    main_menu()
+                if MENU_SELECTION_FACTION1.checkForInput(MENU_SELECTION_MOUSE_POS):
                     char_select(1)
-                if faction2_rect.collidepoint(pygame.mouse.get_pos()):
+                if MENU_SELECTION_FACTION2.checkForInput(MENU_SELECTION_MOUSE_POS):
                     char_select(2)
 
-        faction1_text = select_button_font.render("* Faction 1", True, (220, 220, 160))
-        faction1_rect = quit_button_text.get_rect(center=(width // 2.1, height // 2.25))
-        faction1_text_hovered = faction1_text
+        pygame.display.update()
 
-        faction2_text = select_button_font.render("* Faction 2", True, (220, 220, 160))
-        faction2_rect = quit_button_text.get_rect(center=(width // 2.1, height // 1.75))
-        faction2_text_hovered = faction2_text
+def char_select(set_n): # Character selection method
+    # Set the window caption
+    pygame.display.set_caption("Character Selection")
 
-        # Draw faction 1 button
-        if faction1_rect.collidepoint(pygame.mouse.get_pos()):
-            faction1_text_hovered = select_button_font.render("* Faction 1", True, (255, 0, 0))
-        # Draw faction 2 button
-        elif faction2_rect.collidepoint(pygame.mouse.get_pos()):
-            faction2_text_hovered = select_button_font.render("* Faction 2", True, (255, 0, 0))
-        # Draw back button
-        elif back_rect.collidepoint(pygame.mouse.get_pos()):
-            back_text_hovered = button_font.render("BACK", True, (255, 0, 0))
-        else:
-            faction1_text_hovered = faction1_text
-            faction2_text_hovered = faction2_text
-            back_text_hovered = back_text
-            # hover_sound_played = False
-
-        screen.blit(faction1_text_hovered, faction1_rect)
-        screen.blit(faction2_text_hovered, faction2_rect)
-        screen.blit(back_text_hovered, back_rect)
-
-        pygame.display.flip()
-
-# Character Selection Screen
-def char_select(set_n):
     while True:
+        # Get character selection mouse position
+        CHARACTER_SELECTION_MOUSE_POS = pygame.mouse.get_pos()
 
-        scaled_BG = pygame.transform.scale(BG, screen.get_size())
-        screen.blit(scaled_BG, (0, 0))
-        sprite_rect = sprite.get_rect()
+        # Draw the screen
+        SCREEN.fill((0, 0, 0))
 
-        back2_text = select_button_font.render("CHANGE FACTION", True, (220, 220, 160))
-        back2_rect = back2_text.get_rect(center=(width // 2.75, height -60))
-        back2_text_hovered = back2_text
+        # Set up character selection background
+        CHARACTER_SELECTION_BG = pygame.transform.scale(pygame.image.load("assets/img/bgwood.jpg"), SCREEN.get_size())
+        SCREEN.blit(CHARACTER_SELECTION_BG, (0, 0))
 
+        # Set up character selection text
+        CHARACTER_TEXT = getFont(100).render("Pick three companions", True, MENU_BASE_COLOR)
+        CHARACTER_RECT = CHARACTER_TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 6))
+        SCREEN.blit(CHARACTER_TEXT, CHARACTER_RECT)
+
+        CHARACTER_SPRITE = pygame.transform.scale(pygame.image.load("assets/img/tmp_char.png"), (100, 100))
+        CHARACTER_SPRITE_RECT = CHARACTER_SPRITE.get_rect(center=(WIDTH // 5, HEIGHT // 2.45))
+        SCREEN.blit(CHARACTER_SPRITE, CHARACTER_SPRITE_RECT)
+
+        # Set up character selection BACK button
+        CHARACTER_SELECTION_BACK = Button(image=None, pos=(WIDTH // 3.5, HEIGHT // 1.06),
+                            text_input="BACK", font=getFont(90), base_color=MENU_BASE_COLOR, hovering_color="red")
+        CHARACTER_SELECTION_BACK.changeColor(CHARACTER_SELECTION_MOUSE_POS)
+        CHARACTER_SELECTION_BACK.update(SCREEN)
+
+        PNAME = getFont(30).render("NameEX", True, MENU_BASE_COLOR)
+        PNAME_RECT = PNAME.get_rect(center=(WIDTH // 5, HEIGHT // 2))
+        SCREEN.blit(PNAME, PNAME_RECT)
+
+        CNAME = getFont(30).render("Class", True, MENU_BASE_COLOR)
+        CNAME_RECT = CNAME.get_rect(center=(WIDTH // 5, HEIGHT // 1.85))
+        SCREEN.blit(CNAME, CNAME_RECT)
+
+        # Set up character selection ABOUT button
+        ABOUT_CHARACTER = Button(image=pygame.transform.scale(pygame.image.load("assets/img/buttonbg.png"), (220, 60)), pos=(WIDTH // 5, HEIGHT // 1.67),
+                            text_input="ABOUT", font=getFont(30), base_color=MENU_BASE_COLOR, hovering_color="red")
+        ABOUT_CHARACTER.changeColor(CHARACTER_SELECTION_MOUSE_POS)
+        ABOUT_CHARACTER.update(SCREEN)
+
+        # Set up character selection PICK button
+        SELECT_CHARACTER = Button(image=pygame.transform.scale(pygame.image.load("assets/img/buttonbg.png"), (220, 60)), pos=(WIDTH // 5, HEIGHT // 1.5),
+                            text_input="PICK", font=getFont(30), base_color=MENU_BASE_COLOR, hovering_color="red")
+        SELECT_CHARACTER.changeColor(CHARACTER_SELECTION_MOUSE_POS)
+        SELECT_CHARACTER.update(SCREEN)
+
+        #CH_BOX = pygame.draw.rect(SCREEN, MENU_BASE_COLOR, (WIDTH // 7.4, HEIGHT // 2.7, 200, 200), 2)
+
+        # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if back2_rect.collidepoint(pygame.mouse.get_pos()):
+                if CHARACTER_SELECTION_BACK.checkForInput(CHARACTER_SELECTION_MOUSE_POS):
                     menu_selection()
-                if ch_box.collidepoint(pygame.mouse.get_pos()):
+                if ABOUT_CHARACTER.checkForInput(CHARACTER_SELECTION_MOUSE_POS):
                     info_window()
 
-        character_text = select_title_font.render("Choose 3 characters:", True, (220, 220, 160))
-        character_rect = character_text.get_rect(center=(width // 2, height // 6))
-        screen.blit(character_text, character_rect)
+        pygame.display.update()
 
-        scaled_sprite = pygame.transform.scale(sprite, (100, 100))
-        screen.blit(scaled_sprite, (width // 6, height // 2.6))
-        pname = ch_info_font.render("NameEX", True, (220, 220, 160))
-        pname_rect = pname.get_rect(center=(width // 5, height // 1.9))
-
-        cname = ch_info_font.render("Class", True, (220, 220, 160))
-        cname_rect = cname.get_rect(center=(width // 5, height // 1.75))
-
-        ch_box = pygame.draw.rect(screen, (220, 220, 160), (width // 6.6,height // 2.7,150,200),2)
-        ch_box_hovered = ch_box
-
-        select_character = ch_info_font.render("Select", True, (220, 220, 160))
-        select_character_rect = pname.get_rect(center=(width // 4.7, height // 1.55))
-
-        screen.blit(pname, pname_rect)
-        screen.blit(cname, cname_rect)
-        screen.blit(select_character, select_character_rect)
-
-        # Draw back button
-        if back2_rect.collidepoint(pygame.mouse.get_pos()):
-            back2_text_hovered = select_button_font.render("CHANGE FACTION", True, (255, 0, 0))
-        elif ch_box.collidepoint(pygame.mouse.get_pos()):
-            ch_box_hovered = pygame.draw.rect(screen, (255, 0, 0), (width // 6.6,height // 2.7,150,200),2)
-        else:
-            back2_text_hovered = back2_text
-            ch_box_hovered = ch_box
-
-        screen.blit(back2_text_hovered, back2_rect)
-
-        pygame.display.flip()
-
-        """
-        for instance in Character.instances:
-	        if instance.faction == set_n :
-        """  
-
-def info_window():
+def info_window(): # Screen that contains informations about character
+     # Set the window caption
+    pygame.display.set_caption("Character Stats and Abilities")
     while True:
+        # Get mouse position
+        X_MOUSE_POS = pygame.mouse.get_pos()
 
+        SCALED_BOX = pygame.transform.scale(pygame.image.load("assets/img/metal.png"), (700, 825))
+        SCREEN.blit(SCALED_BOX, (425, 25))   
+
+        # Set up X button (back to character selection)
+        X = Button(image=None, pos=(WIDTH // 1.5, HEIGHT // 10),
+                            text_input="X", font=getFont(50), base_color="red", hovering_color=(255, 77, 77))
+        X.changeColor(X_MOUSE_POS)
+        X.update(SCREEN)   
+
+        CHARACTER_SPRITE = pygame.transform.scale(pygame.image.load("assets/img/tmp_char.png"), (200, 200))
+        CHARACTER_SPRITE_RECT = CHARACTER_SPRITE.get_rect(center=(WIDTH // 2.4, HEIGHT // 4))
+        SCREEN.blit(CHARACTER_SPRITE, CHARACTER_SPRITE_RECT)
+
+        PNAME = getFont(30).render("NameEX", True, (65, 32, 96))
+        PNAME_RECT = PNAME.get_rect(center=(WIDTH // 1.85, HEIGHT // 6))
+        SCREEN.blit(PNAME, PNAME_RECT)
+
+        CNAME = getFont(30).render("Class", True, (65, 32, 96))
+        CNAME_RECT = CNAME.get_rect(center=(WIDTH // 1.9, HEIGHT // 4.75))
+        SCREEN.blit(CNAME, CNAME_RECT)
+
+        # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if X_rect.collidepoint(pygame.mouse.get_pos()):
-                    scaled_BG = pygame.transform.scale(BG, screen.get_size())
-                    screen.blit(scaled_BG, (0, 0))
+                if X.checkForInput(X_MOUSE_POS):
+                     # Set up character selection background
+                    CHARACTER_SELECTION_BG = pygame.transform.scale(pygame.image.load("assets/img/bgwood.jpg"), SCREEN.get_size())
+                    SCREEN.blit(CHARACTER_SELECTION_BG, (0, 0))
                     return
-
-        scaled_box = pygame.transform.scale(info_pic, (700, 825))
-        screen.blit(scaled_box, (425, 25))
-
-        X = select_button_font.render("X", True, (230, 0, 0))
-        X_rect = X.get_rect(center=(width // 1.4, height // 10))   
-        X_hovered = X       
-
-        scaled_sprite = pygame.transform.scale(sprite, (200, 200))
-        screen.blit(scaled_sprite, (width // 2.75,  height // 8))
-        pname = ch_info_font.render("NameEX", True, (65, 32, 96))
-        pname_rect = pname.get_rect(center=(width // 1.85, height // 6))
-        screen.blit(pname, pname_rect)
-        cname = ch_info_font.render("Class", True, (65, 32, 96))
-        cname_rect = cname.get_rect(center=(width // 1.9, height // 4.75))
-        screen.blit(cname, cname_rect)
-
-        # Draw back button
-        if X_rect.collidepoint(pygame.mouse.get_pos()):
-             X_hovered = select_button_font.render("X", True, (255, 77, 77))
-        else:
-             X_hovered = X
-        screen.blit(X_hovered, X_rect)
 
         pygame.display.flip()
 
