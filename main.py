@@ -1,7 +1,8 @@
 import pygame
 import sys
 import os
-from button import Button
+from button import Button, ToggleButton
+from character import *
 
 # Initialize Pygame
 pygame.init()
@@ -28,6 +29,10 @@ pygame.mixer.music.play(-1, 0, 4000)
 pygame.mixer.music.set_volume(0.5)
 # Set up hover sound flag
 hover_sound_played = False
+
+# Lists
+chosen = []
+enemies = []
 
 def getFont(size): # Returns Bitmgothic in the specified size
     font_path = "assets/font/Bitmgothic.ttf"
@@ -214,6 +219,15 @@ def menu_selection(): # Menu selection method
 def char_select(set_n): # Character selection method
     # Set the window caption
     pygame.display.set_caption("Character Selection")
+     
+    
+    SELECT_CHARACTER_1 = ToggleButton(image=pygame.transform.scale(pygame.image.load("assets/img/buttonbg.png"), (220, 60)), pos=(305, 570),
+                 text_input="PICK", font=getFont(30), base_color=MENU_BASE_COLOR, hovering_color="red")
+    SELECT_CHARACTER_2 = ToggleButton(image=pygame.transform.scale(pygame.image.load("assets/img/buttonbg.png"), (220, 60)), pos=(555, 570),
+                 text_input="PICK", font=getFont(30), base_color=MENU_BASE_COLOR, hovering_color="red")
+    SELECT_CHARACTER_3 = ToggleButton(image=pygame.transform.scale(pygame.image.load("assets/img/buttonbg.png"), (220, 60)), pos=(805, 570),
+                 text_input="PICK", font=getFont(30), base_color=MENU_BASE_COLOR, hovering_color="red")
+
 
     while True:
         # Get character selection mouse position
@@ -231,35 +245,73 @@ def char_select(set_n): # Character selection method
         CHARACTER_RECT = CHARACTER_TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 6))
         SCREEN.blit(CHARACTER_TEXT, CHARACTER_RECT)
 
-        CHARACTER_SPRITE = pygame.transform.scale(pygame.image.load("assets/img/tmp_char.png"), (100, 100))
-        CHARACTER_SPRITE_RECT = CHARACTER_SPRITE.get_rect(center=(WIDTH // 5, HEIGHT // 2.45))
-        SCREEN.blit(CHARACTER_SPRITE, CHARACTER_SPRITE_RECT)
-
         # Set up character selection BACK button
         CHARACTER_SELECTION_BACK = Button(image=None, pos=(WIDTH // 3.5, HEIGHT // 1.06),
                             text_input="BACK", font=getFont(90), base_color=MENU_BASE_COLOR, hovering_color="red")
         CHARACTER_SELECTION_BACK.changeColor(CHARACTER_SELECTION_MOUSE_POS)
         CHARACTER_SELECTION_BACK.update(SCREEN)
 
-        PNAME = getFont(30).render("NameEX", True, MENU_BASE_COLOR)
-        PNAME_RECT = PNAME.get_rect(center=(WIDTH // 5, HEIGHT // 2))
-        SCREEN.blit(PNAME, PNAME_RECT)
+        x = 305 
+        y = 350
+        i=0
 
-        CNAME = getFont(30).render("Class", True, MENU_BASE_COLOR)
-        CNAME_RECT = CNAME.get_rect(center=(WIDTH // 5, HEIGHT // 1.85))
-        SCREEN.blit(CNAME, CNAME_RECT)
+        for instance in Character.instances:
+            if instance not in enemies and i==0: 
+                if instance.faction != set_n :
+                    enemies.append(instance)
+                    if len(enemies) == 3:
+                        break 
 
-        # Set up character selection ABOUT button
-        ABOUT_CHARACTER = Button(image=pygame.transform.scale(pygame.image.load("assets/img/buttonbg.png"), (220, 60)), pos=(WIDTH // 5, HEIGHT // 1.67),
-                            text_input="ABOUT", font=getFont(30), base_color=MENU_BASE_COLOR, hovering_color="red")
-        ABOUT_CHARACTER.changeColor(CHARACTER_SELECTION_MOUSE_POS)
-        ABOUT_CHARACTER.update(SCREEN)
+            if instance.faction == set_n :
+                instance.select_list(SCREEN, x, y)
+                i+=1 
+                 # Set up character selection ABOUT button
+                ABOUT_CHARACTER = Button(image=pygame.transform.scale(pygame.image.load("assets/img/buttonbg.png"), (220, 60)), pos=(x, y+165),
+                text_input="ABOUT", font=getFont(30), base_color=MENU_BASE_COLOR, hovering_color="red")
+                ABOUT_CHARACTER.changeColor(CHARACTER_SELECTION_MOUSE_POS)
+                ABOUT_CHARACTER.update(SCREEN)
+                # Set up character selection PICK button
+                SELECT_CHARACTER_1.changeColor(CHARACTER_SELECTION_MOUSE_POS)
+                SELECT_CHARACTER_1.update(SCREEN)
+                SELECT_CHARACTER_2.changeColor(CHARACTER_SELECTION_MOUSE_POS)
+                SELECT_CHARACTER_2.update(SCREEN)
+                SELECT_CHARACTER_3.changeColor(CHARACTER_SELECTION_MOUSE_POS)
+                SELECT_CHARACTER_3.update(SCREEN)
+                x += 250 # wyświetlenie zmian na ekranie
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if ABOUT_CHARACTER.checkForInput(CHARACTER_SELECTION_MOUSE_POS):
+                            info_window(instance) 
+                        if i==1:
+                            if SELECT_CHARACTER_1.checkForInput(CHARACTER_SELECTION_MOUSE_POS):
+                                if instance not in chosen:
+                                    chosen.append(instance)
+                                else:
+                                    chosen.remove(instance) 
+                        if i==2:
+                            if SELECT_CHARACTER_2.checkForInput(CHARACTER_SELECTION_MOUSE_POS):
+                                if instance not in chosen:
+                                    chosen.append(instance)
+                                else:
+                                    chosen.remove(instance)      
+                        if i==3:
+                            if SELECT_CHARACTER_3.checkForInput(CHARACTER_SELECTION_MOUSE_POS):
+                                if instance not in chosen:
+                                    chosen.append(instance)
+                                else:
+                                    chosen.remove(instance)                                                            
+                        if CHARACTER_SELECTION_BACK.checkForInput(CHARACTER_SELECTION_MOUSE_POS):
+                            return            
 
-        # Set up character selection PICK button
-        SELECT_CHARACTER = Button(image=pygame.transform.scale(pygame.image.load("assets/img/buttonbg.png"), (220, 60)), pos=(WIDTH // 5, HEIGHT // 1.5),
-                            text_input="PICK", font=getFont(30), base_color=MENU_BASE_COLOR, hovering_color="red")
-        SELECT_CHARACTER.changeColor(CHARACTER_SELECTION_MOUSE_POS)
-        SELECT_CHARACTER.update(SCREEN)
+        if len(chosen) > 2 and len(chosen) < 4 :
+            # Set up character selection START button
+            START_FIGHT = Button(image=None, pos=(WIDTH // 1.45, HEIGHT // 1.06), 
+             text_input="START", font=getFont(90), base_color=MENU_BASE_COLOR, hovering_color="red")
+            START_FIGHT.changeColor(CHARACTER_SELECTION_MOUSE_POS)
+            START_FIGHT.update(SCREEN)
 
         #CH_BOX = pygame.draw.rect(SCREEN, MENU_BASE_COLOR, (WIDTH // 7.4, HEIGHT // 2.7, 200, 200), 2)
 
@@ -271,12 +323,12 @@ def char_select(set_n): # Character selection method
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if CHARACTER_SELECTION_BACK.checkForInput(CHARACTER_SELECTION_MOUSE_POS):
                     menu_selection()
-                if ABOUT_CHARACTER.checkForInput(CHARACTER_SELECTION_MOUSE_POS):
-                    info_window()
+                if START_FIGHT.checkForInput(CHARACTER_SELECTION_MOUSE_POS):
+                    battle(enemies)
 
         pygame.display.update()
 
-def info_window(): # Screen that contains informations about character
+def info_window(character): # Screen that contains informations about character
      # Set the window caption
     pygame.display.set_caption("Character Stats and Abilities")
     while True:
@@ -292,18 +344,7 @@ def info_window(): # Screen that contains informations about character
         X.changeColor(X_MOUSE_POS)
         X.update(SCREEN)   
 
-        CHARACTER_SPRITE = pygame.transform.scale(pygame.image.load("assets/img/tmp_char.png"), (200, 200))
-        CHARACTER_SPRITE_RECT = CHARACTER_SPRITE.get_rect(center=(WIDTH // 2.4, HEIGHT // 4))
-        SCREEN.blit(CHARACTER_SPRITE, CHARACTER_SPRITE_RECT)
-
-        PNAME = getFont(30).render("NameEX", True, (65, 32, 96))
-        PNAME_RECT = PNAME.get_rect(center=(WIDTH // 1.85, HEIGHT // 6))
-        SCREEN.blit(PNAME, PNAME_RECT)
-
-        CNAME = getFont(30).render("Class", True, (65, 32, 96))
-        CNAME_RECT = CNAME.get_rect(center=(WIDTH // 1.9, HEIGHT // 4.75))
-        SCREEN.blit(CNAME, CNAME_RECT)
-
+        character.stats_blit_(SCREEN)
         # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -318,4 +359,21 @@ def info_window(): # Screen that contains informations about character
 
         pygame.display.flip()
 
+'''
+def battle(enemies):
+         # Set the window caption
+    pygame.display.set_caption("Battle Mode")
+    while True:
+       
+        MOUSE_POS = pygame.mouse.get_pos()
+        
+        # Handle events
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+
+        pygame.display.flip()
+'''
 main_menu()

@@ -48,3 +48,32 @@ class Button():
         # Else leave it be
         else:
             self.text = self.font.render(self.text_input, True, self.base_color)
+
+class ToggleButton(Button):
+    # Initializing the button
+    def __init__(self, image, pos, text_input, font, base_color, hovering_color):
+        super().__init__(image, pos, text_input, font, base_color, hovering_color)
+        # Boolean indicating whether the button is toggled
+        self.toggled = False
+    
+    # Check for input method, checks whether the button is pressed and toggles its state
+    def checkForInput(self, position):
+        # If pressed, toggle the state
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+            self.toggled = not self.toggled
+            return True
+        # Otherwise return False
+        return False
+    
+    # Change color method, checks whether the button is hovered over and changes the color
+    def changeColor(self, position):
+        # If hovered over, change the color to the hovered color
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top, self.rect.bottom):
+            if not self.toggled:
+                self.text = self.font.render(self.text_input, True, self.hovering_color)
+        # Else leave it be
+        else:
+            if not self.toggled:
+                self.text = self.font.render(self.text_input, True, self.base_color)
+            else:
+                self.text = self.font.render(self.text_input, True, self.hovering_color)   
