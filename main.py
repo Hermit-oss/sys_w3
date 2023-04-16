@@ -114,40 +114,40 @@ def menu_credits():
     pygame.display.set_caption("Credits")
     while True:
         # Get credits mouse position
-        CREDITS_MOUSE_POS = pygame.mouse.get_pos()
+        MOUSE_POS = pygame.mouse.get_pos()
 
         # Draw the screen
         SCREEN.fill((0, 0, 0))
 
         # Set up credits background
-        CREDITS_BG = pygame.transform.scale(pygame.image.load("assets/img/bgwood.jpg"), SCREEN.get_size())
-        SCREEN.blit(CREDITS_BG, (0, 0))
+        BG = pygame.transform.scale(pygame.image.load("assets/img/bgwood.jpg"), SCREEN.get_size())
+        SCREEN.blit(BG, (0, 0))
 
         # Set up credits text
-        CREDITS_TEXT = getFont(100).render("We're thankful to", True, MENU_BASE_COLOR)
-        CREDITS_RECT = CREDITS_TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 6))
-        SCREEN.blit(CREDITS_TEXT, CREDITS_RECT)
+        TEXT = getFont(100).render("We're thankful to", True, MENU_BASE_COLOR)
+        RECT = TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 6))
+        SCREEN.blit(TEXT, RECT)
 
         # Set up credits text
-        CREDITS_TEXT1 = getFont(50).render("Creators: JJEntertainment", True, MENU_BASE_COLOR)
-        CREDITS_RECT1 = CREDITS_TEXT1.get_rect(center=(WIDTH // 2, HEIGHT // 3))
-        SCREEN.blit(CREDITS_TEXT1, CREDITS_RECT1)
+        TEXT1 = getFont(50).render("Creators: JJEntertainment", True, MENU_BASE_COLOR)
+        RECT1 = TEXT1.get_rect(center=(WIDTH // 2, HEIGHT // 3))
+        SCREEN.blit(TEXT1, RECT1)
 
         # Set up credits text
-        CREDITS_TEXT2 = getFont(50).render("BG Anima: Camille Unknown", True, MENU_BASE_COLOR)
-        CREDITS_RECT2 = CREDITS_TEXT2.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-        SCREEN.blit(CREDITS_TEXT2, CREDITS_RECT2)
+        TEXT2 = getFont(50).render("BG Anima: Camille Unknown", True, MENU_BASE_COLOR)
+        RECT2 = TEXT2.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        SCREEN.blit(TEXT2, RECT2)
 
         # Set up credits text
-        CREDITS_TEXT3 = getFont(50).render("BG Music: TBD...", True, MENU_BASE_COLOR)
-        CREDITS_RECT3 = CREDITS_TEXT3.get_rect(center=(WIDTH // 2, HEIGHT // 1.5))
-        SCREEN.blit(CREDITS_TEXT3, CREDITS_RECT3)
+        TEXT3 = getFont(50).render("BG Music: TBD...", True, MENU_BASE_COLOR)
+        RECT3 = TEXT3.get_rect(center=(WIDTH // 2, HEIGHT // 1.5))
+        SCREEN.blit(TEXT3, RECT3)
 
         # Set up credits BACK button
-        CREDITS_BACK = Button(image=None, pos=(WIDTH // 3.5, HEIGHT // 1.06),
+        BACK = Button(image=None, pos=(WIDTH // 3.5, HEIGHT // 1.06),
                             text_input="BACK", font=getFont(90), base_color=MENU_BASE_COLOR, hovering_color="red")
-        CREDITS_BACK.changeColor(CREDITS_MOUSE_POS)
-        CREDITS_BACK.update(SCREEN)
+        BACK.changeColor(MOUSE_POS)
+        BACK.update(SCREEN)
 
         # Handle events
         for event in pygame.event.get():
@@ -155,7 +155,7 @@ def menu_credits():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if CREDITS_BACK.checkForInput(CREDITS_MOUSE_POS):
+                if BACK.checkForInput(MOUSE_POS):
                     main_menu()
 
         pygame.display.update()
@@ -227,7 +227,10 @@ def char_select(set_n): # Character selection method
                  text_input="PICK", font=getFont(30), base_color=MENU_BASE_COLOR, hovering_color="red")
     SELECT_CHARACTER_3 = ToggleButton(image=pygame.transform.scale(pygame.image.load("assets/img/buttonbg.png"), (220, 60)), pos=(805, 570),
                  text_input="PICK", font=getFont(30), base_color=MENU_BASE_COLOR, hovering_color="red")
-
+    SELECT_CHARACTER_4 = ToggleButton(image=pygame.transform.scale(pygame.image.load("assets/img/buttonbg.png"), (220, 60)), pos=(1055, 570),
+                 text_input="PICK", font=getFont(30), base_color=MENU_BASE_COLOR, hovering_color="red")
+    SELECT_CHARACTER_5 = ToggleButton(image=pygame.transform.scale(pygame.image.load("assets/img/buttonbg.png"), (220, 60)), pos=(1305, 570),
+                 text_input="PICK", font=getFont(30), base_color=MENU_BASE_COLOR, hovering_color="red")
 
     while True:
         # Get character selection mouse position
@@ -257,10 +260,8 @@ def char_select(set_n): # Character selection method
 
         for instance in Character.instances:
             if instance not in enemies and i==0: 
-                if instance.faction != set_n :
+                if instance.faction != set_n and len(enemies)<3:
                     enemies.append(instance)
-                    if len(enemies) == 3:
-                        break 
 
             if instance.faction == set_n :
                 instance.select_list(SCREEN, x, y)
@@ -277,6 +278,10 @@ def char_select(set_n): # Character selection method
                 SELECT_CHARACTER_2.update(SCREEN)
                 SELECT_CHARACTER_3.changeColor(CHARACTER_SELECTION_MOUSE_POS)
                 SELECT_CHARACTER_3.update(SCREEN)
+                SELECT_CHARACTER_4.changeColor(CHARACTER_SELECTION_MOUSE_POS)
+                SELECT_CHARACTER_4.update(SCREEN)
+                SELECT_CHARACTER_5.changeColor(CHARACTER_SELECTION_MOUSE_POS)
+                SELECT_CHARACTER_5.update(SCREEN)                
                 x += 250 # wyświetlenie zmian na ekranie
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -302,18 +307,24 @@ def char_select(set_n): # Character selection method
                                 if instance not in chosen:
                                     chosen.append(instance)
                                 else:
-                                    chosen.remove(instance)                                                            
+                                    chosen.remove(instance)
+                        if i==4:
+                            if SELECT_CHARACTER_4.checkForInput(CHARACTER_SELECTION_MOUSE_POS):
+                                if instance not in chosen:
+                                    chosen.append(instance)
+                                else:
+                                    chosen.remove(instance)      
+                        if i==5:
+                            if SELECT_CHARACTER_5.checkForInput(CHARACTER_SELECTION_MOUSE_POS):
+                                if instance not in chosen:
+                                    chosen.append(instance)
+                                else:
+                                    chosen.remove(instance)                                                                                                 
                         if CHARACTER_SELECTION_BACK.checkForInput(CHARACTER_SELECTION_MOUSE_POS):
                             return            
 
         if len(chosen) > 2 and len(chosen) < 4 :
-            # Set up character selection START button
-            START_FIGHT = Button(image=None, pos=(WIDTH // 1.45, HEIGHT // 1.06), 
-             text_input="START", font=getFont(90), base_color=MENU_BASE_COLOR, hovering_color="red")
-            START_FIGHT.changeColor(CHARACTER_SELECTION_MOUSE_POS)
-            START_FIGHT.update(SCREEN)
-
-        #CH_BOX = pygame.draw.rect(SCREEN, MENU_BASE_COLOR, (WIDTH // 7.4, HEIGHT // 2.7, 200, 200), 2)
+            battle()
 
         # Handle events
         for event in pygame.event.get():
@@ -323,8 +334,9 @@ def char_select(set_n): # Character selection method
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if CHARACTER_SELECTION_BACK.checkForInput(CHARACTER_SELECTION_MOUSE_POS):
                     menu_selection()
-                if START_FIGHT.checkForInput(CHARACTER_SELECTION_MOUSE_POS):
-                    battle(enemies)
+                    chosen.clear()
+                    enemies.clear()
+
 
         pygame.display.update()
 
@@ -332,6 +344,13 @@ def info_window(character): # Screen that contains informations about character
      # Set the window caption
     pygame.display.set_caption("Character Stats and Abilities")
     while True:
+        # Draw the screen
+        SCREEN.fill((0, 0, 0))
+
+        # Set up menu selection background
+        MENU_SELECTION_BG = pygame.transform.scale(pygame.image.load("assets/img/bgwood.jpg"), SCREEN.get_size())
+        SCREEN.blit(MENU_SELECTION_BG, (0, 0))
+
         # Get mouse position
         X_MOUSE_POS = pygame.mouse.get_pos()
 
@@ -359,21 +378,127 @@ def info_window(character): # Screen that contains informations about character
 
         pygame.display.flip()
 
-'''
-def battle(enemies):
-         # Set the window caption
+
+def battle():
     pygame.display.set_caption("Battle Mode")
     while True:
-       
         MOUSE_POS = pygame.mouse.get_pos()
+        SCREEN.fill(MENU_BASE_COLOR)
+
+        player = chosen[0]
+        rival = enemies[0]
+        playerBar = HealthBar()
+        playerBar.init(350,270)
+        playerBar.drawRects()
+        playerBar.updateBar(player,425,250)
+        computerBar = HealthBar()
+        computerBar.init(1100,50)
+        computerBar.drawRects()
+        computerBar.updateBar(player,1175,30)
+
+        spriteP = pygame.transform.scale(player.image_front, (250, 250))
+        spriteP_rect = spriteP.get_rect(center=(width // 3.5, height // 2))
+        SCREEN.blit(spriteP, spriteP_rect)
+        spriteR = pygame.transform.scale(rival.image_front, (200, 200))
+        spriteR_rect = spriteR.get_rect(center=(width // 1.3, height // 5))
+        SCREEN.blit(spriteR, spriteR_rect)
+        actions = pygame.transform.scale(pygame.image.load("assets/img/scroll.png"), (1500, 400))
+        actions_rect =  actions.get_rect(center=(width // 2, height // 1.1))
+        SCREEN.blit(actions, actions_rect)
+
         
+        # Set up buttons
+        ABILITY1 = Button(image=None, pos=(WIDTH // 5, HEIGHT // 1.17),
+                            text_input=str(player.abilities[0][4]), font=getFont(20), base_color=MENU_BASE_COLOR, hovering_color="red")
+        ABILITY1.changeColor(MOUSE_POS)
+        ABILITY1.update(SCREEN)
+        ABILITY2 = Button(image=None, pos=(WIDTH // 2.5, HEIGHT // 1.17),
+                            text_input=str(player.abilities[1][4]), font=getFont(20), base_color=MENU_BASE_COLOR, hovering_color="red")
+        ABILITY2.changeColor(MOUSE_POS)
+        ABILITY2.update(SCREEN)
+        ABILITY3 = Button(image=None, pos=(WIDTH // 5, HEIGHT // 1.07),
+                            text_input=str(player.abilities[2][4]), font=getFont(20), base_color=MENU_BASE_COLOR, hovering_color="red")
+        ABILITY3.changeColor(MOUSE_POS)
+        ABILITY3.update(SCREEN)
+        ABILITY4 = Button(image=None, pos=(WIDTH // 2.5, HEIGHT // 1.07),
+                            text_input=str(player.abilities[3][4]), font=getFont(20), base_color=MENU_BASE_COLOR, hovering_color="red")
+        ABILITY4.changeColor(MOUSE_POS)
+        ABILITY4.update(SCREEN)
+        POTIONS = Button(image=None, pos=(WIDTH // 1.5, HEIGHT // 1.12),
+                            text_input="Use Potion (+30 HP)", font=getFont(20), base_color=MENU_BASE_COLOR, hovering_color="red")
+        POTIONS.changeColor(MOUSE_POS)
+        POTIONS.update(SCREEN)
+
+
+
         # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            #if event.type == pygame.MOUSEBUTTONDOWN:
+        
+        pygame.display.update()
 
-        pygame.display.flip()
-'''
 main_menu()
+'''
+while fainted != True:
+    #Executing the move selection functions for both the player and the computer
+    pMove = pMoveSelect(pMoveList)
+    cMove = cMoveSelect(cMoveList)
+    
+    #If player stat is faster, player attack sequence executes before computer
+    #attack sequence. Else, computer attack sequence attacks first.
+    if pPokemon[2] < cPokemon[2]:
+      #Execute attack sequence for player
+      pAttackSequence(pPokemon, pMove, cPokemon, pStats, cStats)
+      #Update the health bar if any changes have occured
+      computerBar.updateBar(cPokemon)
+      computerBar.drawRects()
+      pygame.display.update()
+      #Checking to see if computer pokemon has fainted. If so, winner is player
+      if cPokemon[1] <= 0:
+        fainted = True
+        winner = "Player"
+        break #break loop to end program
+      cAttackSequence(cPokemon, cMove, pPokemon, cStats, pStats)
+      playerBar.updateBar(pPokemon)
+      playerBar.drawRects()
+      pygame.display.update()
+      if pPokemon[1] <= 0:
+        fainted = True
+        winner = "Computer"
+        break
+    else:
+      cAttackSequence(cPokemon, cMove, pPokemon, cStats, pStats)
+      playerBar.updateBar(pPokemon)
+      playerBar.drawRects()
+      pygame.display.update()
+      if pPokemon[1] <= 0:
+        fainted = True
+        winner = "Computer"
+        break
+      pAttackSequence(pPokemon, pMove, cPokemon, pStats, cStats)
+      computerBar.updateBar(cPokemon)
+      computerBar.drawRects()
+      pygame.display.update()
+      if cPokemon[1] <= 0:
+        fainted = True
+        winner = "Player"
+        break
+    redraw()
+  #If the player won, player pokemon is displayed on the victory screen
+  if winner == "Player":
+    DISPLAYSURF.blit(endBackground,(0,0))
+    DISPLAYSURF.blit(playerImgList[0],(100,375))
+    drawText("The winner is "+pPokemon[0]+ "!", font, TEXTSURF, 120, 100, BLACK)
+    pygame.display.update()
+    time.sleep(2)
+  #If the computer won, computer pokemon is displayed on the victory screen
+  else:
+    DISPLAYSURF.blit(endBackground,(0,0))
+    DISPLAYSURF.blit(computerImgList[0],(100,375))
+    drawText("The winner is "+cPokemon[0]+ "!", font, TEXTSURF, 120, 100, BLACK)
+    pygame.display.update()
+    time.sleep(2)
+'''
