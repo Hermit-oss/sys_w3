@@ -34,7 +34,7 @@ class Character():
 	def set_abilities(self):
 		self.abilities = []
 
-		targetFile = self.name.lower() + '.txt'
+		targetFile = os.path.join("txt", self.name.lower() + '.txt')
 		with open(targetFile, 'r') as f:
 			fileString = f.read()
 			fileList = fileString.split('\n')
@@ -47,7 +47,7 @@ class Character():
 
 		moveNumber = 0
 		while moveNumber<4:
-			moveName = targetList[moveNumber].lower() + '.txt' 
+			moveName = os.path.join("txt", targetList[moveNumber].lower() + '.txt')
 			with open(moveName, 'r') as f:
 				fileString2 = f.read()
 				fileList2 = fileString2.split('\n')
@@ -116,9 +116,8 @@ class Character():
 	def use_potion(self):
         # check if there are potions left
 		if self.num_potions > 0:
-            
-            # add 30 hp (but don't go over the max hp)
-			self.current_hp += 30
+            # add 10 hp (but don't go over the max hp)
+			self.current_hp += 10
 			if self.current_hp > self.hp:
 				self.current_hp = self.hp    
             # decrease the number of potions left
@@ -171,7 +170,7 @@ class HealthBar():
 		#Function for determining the appropriate current length of health stripe
 		maxHealth = charact.hp
 		currentHealth = charact.current_hp
-		healthProportion = int(currentHealth)/float(maxHealth)
+		healthProportion = currentHealth/maxHealth
 		newDimension = healthProportion*self.negDimensions[0]
 		self.posDimensions[0] = newDimension
 		# display "HP" text

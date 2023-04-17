@@ -1,6 +1,5 @@
 import pygame
-import sys
-import os
+import sys, os, random, time
 from button import Button, ToggleButton
 from character import *
 
@@ -384,6 +383,7 @@ def battle():
     while True:
         MOUSE_POS = pygame.mouse.get_pos()
         SCREEN.fill(MENU_BASE_COLOR)
+        #over = False
 
         player = chosen[0]
         rival = enemies[0]
@@ -394,7 +394,7 @@ def battle():
         computerBar = HealthBar()
         computerBar.init(1100,50)
         computerBar.drawRects()
-        computerBar.updateBar(player,1175,30)
+        computerBar.updateBar(rival,1175,30)
 
         spriteP = pygame.transform.scale(player.image_front, (250, 250))
         spriteP_rect = spriteP.get_rect(center=(width // 3.5, height // 2))
@@ -405,42 +405,150 @@ def battle():
         actions = pygame.transform.scale(pygame.image.load("assets/img/scroll.png"), (1500, 400))
         actions_rect =  actions.get_rect(center=(width // 2, height // 1.1))
         SCREEN.blit(actions, actions_rect)
+       
+        picked = 0
+        h_flag = False
 
-        
         # Set up buttons
-        ABILITY1 = Button(image=None, pos=(WIDTH // 5, HEIGHT // 1.17),
-                            text_input=str(player.abilities[0][4]), font=getFont(20), base_color=MENU_BASE_COLOR, hovering_color="red")
+        ABILITY1 = Button(image=None, pos=(WIDTH // 5, HEIGHT // 1.17),text_input=str(player.abilities[0][4]), 
+        font=getFont(20), base_color=MENU_BASE_COLOR, hovering_color="red")
+        ABILITY2 = Button(image=None, pos=(WIDTH // 2.5, HEIGHT // 1.17),text_input=str(player.abilities[1][4]), 
+        font=getFont(20), base_color=MENU_BASE_COLOR, hovering_color="red")
+        ABILITY3 = Button(image=None, pos=(WIDTH // 5, HEIGHT // 1.07), text_input=str(player.abilities[2][4]), 
+        font=getFont(20), base_color=MENU_BASE_COLOR, hovering_color="red")
+        ABILITY4 = Button(image=None, pos=(WIDTH // 2.5, HEIGHT // 1.07),text_input=str(player.abilities[3][4]), 
+        font=getFont(20), base_color=MENU_BASE_COLOR, hovering_color="red")
+        POTIONS = Button(image=None, pos=(WIDTH // 1.5, HEIGHT // 1.17), text_input="Use Potion (+10 HP)",
+        font=getFont(20), base_color=MENU_BASE_COLOR, hovering_color="red")
         ABILITY1.changeColor(MOUSE_POS)
         ABILITY1.update(SCREEN)
-        ABILITY2 = Button(image=None, pos=(WIDTH // 2.5, HEIGHT // 1.17),
-                            text_input=str(player.abilities[1][4]), font=getFont(20), base_color=MENU_BASE_COLOR, hovering_color="red")
         ABILITY2.changeColor(MOUSE_POS)
         ABILITY2.update(SCREEN)
-        ABILITY3 = Button(image=None, pos=(WIDTH // 5, HEIGHT // 1.07),
-                            text_input=str(player.abilities[2][4]), font=getFont(20), base_color=MENU_BASE_COLOR, hovering_color="red")
         ABILITY3.changeColor(MOUSE_POS)
         ABILITY3.update(SCREEN)
-        ABILITY4 = Button(image=None, pos=(WIDTH // 2.5, HEIGHT // 1.07),
-                            text_input=str(player.abilities[3][4]), font=getFont(20), base_color=MENU_BASE_COLOR, hovering_color="red")
         ABILITY4.changeColor(MOUSE_POS)
         ABILITY4.update(SCREEN)
-        POTIONS = Button(image=None, pos=(WIDTH // 1.5, HEIGHT // 1.12),
-                            text_input="Use Potion (+30 HP)", font=getFont(20), base_color=MENU_BASE_COLOR, hovering_color="red")
-        POTIONS.changeColor(MOUSE_POS)
+        POTIONS.changeColor(MOUSE_POS)   
         POTIONS.update(SCREEN)
-
-
 
         # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            #if event.type == pygame.MOUSEBUTTONDOWN:
-        
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if ABILITY1.checkForInput(MOUSE_POS):
+                    pAction = player.abilities[0]
+                    #turn(player, rival, pAction)
+
+                if ABILITY2.checkForInput(MOUSE_POS):  
+                    pAction = player.abilities[1]
+                    #turn(player, rival, pAction)
+
+                if ABILITY3.checkForInput(MOUSE_POS):
+                    pAction = player.abilities[2]
+                    #turn(player, rival, pAction)
+ 
+                if ABILITY4.checkForInput(MOUSE_POS):
+                    pAction = player.abilities[3]
+                    #turn(player, rival, pAction)
+
+                if POTIONS.checkForInput(MOUSE_POS):
+                    player.use_potion()
+                    POTION_TEXT = getFont(20).render(f'You have {player.num_potions} potions left', True, "red")
+                    POTION_RECT = POTION_TEXT.get_rect(center=(WIDTH // 1.5, HEIGHT // 1.07))
+                    SCREEN.blit(POTION_TEXT, POTION_RECT)
+                    pygame.display.update()
+                    time.sleep(2)
+                    if player.num_potions > 0:
+                        rivalturn(player,rival, playerBar)
+
+        #if player.fainted == True:
+        #if rival.fainted == True:
+        playerBar.updateBar(player,425,250)
+        playerBar.drawRects()
+        computerBar.drawRects()
+        computerBar.updateBar(rival,1175,30)
         pygame.display.update()
 
+def rivalturn(player,rival,playerBar):
+    rAction =  rival.abilities[random.randint(0,3)]
+    cAttack(rAction, player, rival)
+    if player.current_hp <= 0:
+        player.fainted = True
+        return
+
+def turn(player, rival, pAction,playerBar,computerBar):
+    rAction =  rival.abilities[random.randint(0,3)]
+    if player.speed > rival.speed:
+        #pAttackSequence(pPokemon, pMove, cPokemon, pStats, cStats)
+        computerBar.updateBar(rival,1175,30)
+        computerBar.drawRects()
+        pygame.display.update()
+        if rival.current_hp <= 0:
+            rival.fainted = True
+            return
+        #cAttack(cPokemon, cMove, pPokemon, cStats, pStats)
+        playerBar.updateBar(player,425,250)
+        playerBar.drawRects()
+        pygame.display.update()
+    else:
+        #cAttack(cPokemon, cMove, pPokemon, cStats, pStats)
+        playerBar.updateBar(player,425,250)
+        playerBar.drawRects()
+        pygame.display.update()
+        if player.current_hp <= 0:
+            player.fainted = True
+            return
+        #pAttackSequence(pPokemon, pMove, cPokemon, pStats, cStats)
+        computerBar.updateBar(rival,1175,30)
+        computerBar.drawRects()
+        pygame.display.update()
+
+def cAttack(rAction, player, rival):
+    print(rival.name + " used " + rAction[4] + ".")
+    time.sleep(1)
+    mode = rAction[0]
+    if mode == "1":
+        DamageMod(rival, rAction, player)
+    elif mode == "21":
+        StatMod(rAction, rival)
+    elif mode == "22":
+        StatMod(rAction, player)
+
+def DamageMod(attacker, attack, target):
+    DMG = int(attack[1])
+    aATK = attacker.attack
+    tDEF = target.defense
+    effect = DMG*(aATK/tDEF) #Calculate actual damage effect
+    target.current_hp = target.current_hp - round(effect)
+    print(attacker.name + " dealt", effect, "damage!")
+    return 
+
+def StatMod(ability, target):
+    targetStat = ability[3]
+    effect = ability[2]
+    if targetStat == "A": #If target stat is attack
+        if effect == "-":
+            target.attack -= 1 #target's attack is lowered
+            print(target.name + "'s" + " Attack fell.")
+            return 
+        else:
+            target.attack += 1 #target's atack is raised
+            print(target.name  + "'s" + " Attack rose.")
+            return 
+    else: 
+        if effect == "-": 
+            target.defense -= 1 #target's defense is lowered
+            print(target.name  + "'s" + " Defense fell.")
+            return 
+        else: 
+            target.defense += 1 #target's defense is raised
+            print(target.name  + "'s" + " Defense rose.")
+            return 
+
 main_menu()
+
 '''
 while fainted != True:
     #Executing the move selection functions for both the player and the computer
@@ -501,4 +609,67 @@ while fainted != True:
     drawText("The winner is "+cPokemon[0]+ "!", font, TEXTSURF, 120, 100, BLACK)
     pygame.display.update()
     time.sleep(2)
+'''
+
+
+
+'''
+def pAttackSequence(pPokemon, pMove, cPokemon, pStats, cStats):
+#Function for applying the series of steps in the player attack sequence. Function
+#simply decides which move function to apply based on the mode of attack being used.
+#Mode 1 is a damage attack, 21 is a stat mod aimed at self, 22 is a stat mod aimed 
+#at a target.
+  DISPLAYSURF.blit(background, (0,0))
+  displayMessage(pPokemon[0] + " used " + pMove[5])
+  time.sleep(1)
+  mode = pMove[0]
+  if mode == "1":
+    cPokemon = DamageMod(pPokemon, pMove, cPokemon, pStats, cStats)
+  elif mode == "21":
+    pStats = StatMod(pMove, pStats, pPokemon[0])
+  elif mode == "22":
+    cStats = StatMod(pMove, cStats, cPokemon[0])
+
+
+    
+def DamageMod(attacker, attack, target, attackerStats, targetStats):
+#Function for handling calculating and applying damge to a target. 
+  typeAdvantage = AdvantageCalc(attack, target) #Determine type advantage
+  #Get values for calculation from stat lists
+  DMG = int(attack[2])
+  aATK = StatIndex(attackerStats, "A")
+  tDEF = StatIndex(targetStats, "D")
+  effect = DMG*(aATK/tDEF)*typeAdvantage #Calculate actual damage effect
+  target[1] = int(target[1]) - effect #apply effect to the stat list for the target pokemon
+  print (attacker[0] + " dealt", effect, "damage!")
+  print ("")
+  #Return the stat list containing the new value for health after application of 
+  #damage effect.
+  return target
+  
+def StatMod(move, targetStats, defenderName):
+#Function for handling stat modifying attacks. This function takes the target 
+#stat list and the move stats as parameters. Depending on the values in the move
+#list, the function applies a specific effect for modifying the stats of the target.
+  targetStat = move[4]
+  effect = move[3]
+  if targetStat == "A": #If target stat is attack...
+    if effect == "-": #And the effect is negative...
+      targetStats[0] -= 1 #target's attack is lowered
+      displayMessage(defenderName + "'s" + " Attack fell.")
+      return targetStats
+    else: #and the ffect is positive... 
+      targetStats[0] += 1 #target's atack is raised
+      displayMessage(defenderName + "'s" + " Attack rose.")
+      return targetStats
+  else: #if target stat is defense...
+    if effect == "-": #and effect is negative...
+      targetStats[1] -= 1 #target's defense is lowered
+      displayMessage(defenderName + "'s" + " Defense fell.")
+      return targetStats
+    else: #and the effect is positive...
+      targetStats[1] += 1 #target's defense is raised
+      displayMessage(defenderName + "'s" + " Defense rose.")
+      #Function returns the new stat levels for the target pokemon
+      return targetStats
 '''
