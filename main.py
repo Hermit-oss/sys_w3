@@ -2,6 +2,7 @@ import pygame
 import sys, os, random, time
 from button import Button, ToggleButton
 from character import *
+from cutscene import Cutscene, CutsceneOne
 
 # Initialize Pygame
 pygame.init()
@@ -17,6 +18,13 @@ for i in range(1, 120):
     frame = pygame.transform.scale(pygame.image.load(filename).convert_alpha(), SCREEN.get_size())
     MENU_FRAMES.append(frame)
 
+# Main menu background animation
+CUTSCENE1_FRAMES = []
+for i in range(1, 4):
+    filename = os.path.join('assets/img/cs1', f'{i}.png')
+    frame = pygame.transform.scale(pygame.image.load(filename).convert_alpha(), SCREEN.get_size())
+    CUTSCENE1_FRAMES.append(frame)
+
 # Colors
 MENU_BASE_COLOR = (180, 150, 100)
 
@@ -28,6 +36,9 @@ pygame.mixer.music.play(-1, 0, 4000)
 pygame.mixer.music.set_volume(0.5)
 # Set up hover sound flag
 hover_sound_played = False
+
+# Set up cutscenes admin
+cutscene = Cutscene(SCREEN)
 
 # Lists
 chosen = []
@@ -138,7 +149,7 @@ def menu_credits():
         SCREEN.blit(TEXT2, RECT2)
 
         # Set up credits text
-        TEXT3 = getFont(50).render("BG Music: TBD...", True, MENU_BASE_COLOR)
+        TEXT3 = getFont(50).render("BG Music: Ruiqi Zhao", True, MENU_BASE_COLOR)
         RECT3 = TEXT3.get_rect(center=(WIDTH // 2, HEIGHT // 1.5))
         SCREEN.blit(TEXT3, RECT3)
 
@@ -162,6 +173,7 @@ def menu_credits():
 def menu_selection(): # Menu selection method
     # Set the window caption
     pygame.display.set_caption("Menu Selection")
+    frame_index = 0
 
     while True:
         # Get menu selection mouse position
@@ -170,48 +182,63 @@ def menu_selection(): # Menu selection method
         # Draw the screen
         SCREEN.fill((0, 0, 0))
 
-        # Set up menu selection background
-        MENU_SELECTION_BG = pygame.transform.scale(pygame.image.load("assets/img/bgwood.jpg"), SCREEN.get_size())
-        SCREEN.blit(MENU_SELECTION_BG, (0, 0))
+        cutscene.start_cutscene(CutsceneOne())
 
-        # Set up menu selection text
-        MENU_SELECTION_TEXT = getFont(100).render("Pledge your allegiance", True, MENU_BASE_COLOR)
-        MENU_SELECTION_RECT = MENU_SELECTION_TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 6))
-        SCREEN.blit(MENU_SELECTION_TEXT, MENU_SELECTION_RECT)
+        if cutscene.cutscene_running:
+            frame = CUTSCENE1_FRAMES[frame_index]
+            frame_index = (frame_index + 1) % len(CUTSCENE1_FRAMES)
+            SCREEN.blit(frame, (0, 0))
 
-        # Set up menu selection FACTION1 button
-        MENU_SELECTION_FACTION1 = Button(image=None, pos=(WIDTH // 2, HEIGHT // 2.25),
-                            text_input="The Crimson Legion", font=getFont(70), base_color=MENU_BASE_COLOR, hovering_color="red")
-        MENU_SELECTION_FACTION1.changeColor(MENU_SELECTION_MOUSE_POS)
-        MENU_SELECTION_FACTION1.update(SCREEN)
+            # Set up menu selection text
+            CUTSCENE1_TEXT = getFont(60).render("Press SPACE", True, MENU_BASE_COLOR)
+            CUTSCENE1_RECT = CUTSCENE1_TEXT.get_rect(center=(7*WIDTH // 8, HEIGHT // 1.06))
+            SCREEN.blit(CUTSCENE1_TEXT, CUTSCENE1_RECT)
 
-        # Set up menu selection FACTION2 button
-        MENU_SELECTION_FACTION2 = Button(image=None, pos=(WIDTH // 2, HEIGHT // 1.75),
-                            text_input="The Mystic Conclave", font=getFont(70), base_color=MENU_BASE_COLOR, hovering_color="red")
-        MENU_SELECTION_FACTION2.changeColor(MENU_SELECTION_MOUSE_POS)
-        MENU_SELECTION_FACTION2.update(SCREEN)
+            cutscene.update()
+            cutscene.draw()
+        else:
+            # Set up menu selection background
+            MENU_SELECTION_BG = pygame.transform.scale(pygame.image.load("assets/img/bgwood.jpg"), SCREEN.get_size())
+            SCREEN.blit(MENU_SELECTION_BG, (0, 0))
 
-        # Set up menu selection BACK button
-        MENU_SELECTION_BACK = Button(image=None, pos=(WIDTH // 3.5, HEIGHT // 1.06),
-                            text_input="BACK", font=getFont(90), base_color=MENU_BASE_COLOR, hovering_color="red")
+            # Set up menu selection text
+            MENU_SELECTION_TEXT = getFont(100).render("Pledge your allegiance", True, MENU_BASE_COLOR)
+            MENU_SELECTION_RECT = MENU_SELECTION_TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 6))
+            SCREEN.blit(MENU_SELECTION_TEXT, MENU_SELECTION_RECT)
 
-        # Set state and blit the buttons, play the hovering sound
-        for button in [MENU_SELECTION_FACTION1, MENU_SELECTION_FACTION2, MENU_SELECTION_BACK]:
-            button.changeColor(MENU_SELECTION_MOUSE_POS)
-            button.update(SCREEN)
+            # Set up menu selection FACTION1 button
+            MENU_SELECTION_FACTION1 = Button(image=None, pos=(WIDTH // 2, HEIGHT // 2.25),
+                                text_input="The Crimson Legion", font=getFont(70), base_color=MENU_BASE_COLOR, hovering_color="red")
+            MENU_SELECTION_FACTION1.changeColor(MENU_SELECTION_MOUSE_POS)
+            MENU_SELECTION_FACTION1.update(SCREEN)
 
-        # Handle events
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if MENU_SELECTION_BACK.checkForInput(MENU_SELECTION_MOUSE_POS):
-                    main_menu()
-                if MENU_SELECTION_FACTION1.checkForInput(MENU_SELECTION_MOUSE_POS):
-                    char_select(1)
-                if MENU_SELECTION_FACTION2.checkForInput(MENU_SELECTION_MOUSE_POS):
-                    char_select(2)
+            # Set up menu selection FACTION2 button
+            MENU_SELECTION_FACTION2 = Button(image=None, pos=(WIDTH // 2, HEIGHT // 1.75),
+                                text_input="The Mystic Conclave", font=getFont(70), base_color=MENU_BASE_COLOR, hovering_color="red")
+            MENU_SELECTION_FACTION2.changeColor(MENU_SELECTION_MOUSE_POS)
+            MENU_SELECTION_FACTION2.update(SCREEN)
+
+            # Set up menu selection BACK button
+            MENU_SELECTION_BACK = Button(image=None, pos=(WIDTH // 3.5, HEIGHT // 1.06),
+                                text_input="BACK", font=getFont(90), base_color=MENU_BASE_COLOR, hovering_color="red")
+
+            # Set state and blit the buttons, play the hovering sound
+            for button in [MENU_SELECTION_FACTION1, MENU_SELECTION_FACTION2, MENU_SELECTION_BACK]:
+                button.changeColor(MENU_SELECTION_MOUSE_POS)
+                button.update(SCREEN)
+
+            # Handle events
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if MENU_SELECTION_BACK.checkForInput(MENU_SELECTION_MOUSE_POS):
+                        main_menu()
+                    if MENU_SELECTION_FACTION1.checkForInput(MENU_SELECTION_MOUSE_POS):
+                        char_select(1)
+                    if MENU_SELECTION_FACTION2.checkForInput(MENU_SELECTION_MOUSE_POS):
+                        char_select(2)
 
         pygame.display.update()
 
@@ -230,6 +257,12 @@ def char_select(set_n): # Character selection method
                  text_input="PICK", font=getFont(30), base_color=MENU_BASE_COLOR, hovering_color="red")
     SELECT_CHARACTER_5 = ToggleButton(image=pygame.transform.scale(pygame.image.load("assets/img/buttonbg.png"), (220, 60)), pos=(1305, 570),
                  text_input="PICK", font=getFont(30), base_color=MENU_BASE_COLOR, hovering_color="red")
+
+    index = 0
+    for instance in Character.instances:
+        if instance not in enemies and index==0: 
+            if instance.faction != set_n and len(enemies)<3:
+                enemies.append(instance)
 
     while True:
         # Get character selection mouse position
@@ -258,9 +291,6 @@ def char_select(set_n): # Character selection method
         i=0
 
         for instance in Character.instances:
-            if instance not in enemies and i==0: 
-                if instance.faction != set_n and len(enemies)<3:
-                    enemies.append(instance)
 
             if instance.faction == set_n :
                 instance.select_list(SCREEN, x, y)
@@ -380,13 +410,15 @@ def info_window(character): # Screen that contains informations about character
 
 def battle():
     pygame.display.set_caption("Battle Mode")
+    iP = 0
+    iC = 0
     while True:
         MOUSE_POS = pygame.mouse.get_pos()
         SCREEN.fill(MENU_BASE_COLOR)
         #over = False
 
-        player = chosen[0]
-        rival = enemies[0]
+        player = chosen[iP]
+        rival = enemies[iC]
         playerBar = HealthBar()
         playerBar.init(350,270)
         playerBar.drawRects()
@@ -396,18 +428,15 @@ def battle():
         computerBar.drawRects()
         computerBar.updateBar(rival,1175,30)
 
-        spriteP = pygame.transform.scale(player.image_front, (250, 250))
+        spriteP = pygame.transform.scale(player.image, (250, 250))
         spriteP_rect = spriteP.get_rect(center=(width // 3.5, height // 2))
         SCREEN.blit(spriteP, spriteP_rect)
-        spriteR = pygame.transform.scale(rival.image_front, (200, 200))
+        spriteR = pygame.transform.scale(rival.image, (200, 200))
         spriteR_rect = spriteR.get_rect(center=(width // 1.3, height // 5))
         SCREEN.blit(spriteR, spriteR_rect)
         actions = pygame.transform.scale(pygame.image.load("assets/img/scroll.png"), (1500, 400))
         actions_rect =  actions.get_rect(center=(width // 2, height // 1.1))
         SCREEN.blit(actions, actions_rect)
-       
-        picked = 0
-        h_flag = False
 
         # Set up buttons
         ABILITY1 = Button(image=None, pos=(WIDTH // 5, HEIGHT // 1.17),text_input=str(player.abilities[0][4]), 
@@ -439,19 +468,16 @@ def battle():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if ABILITY1.checkForInput(MOUSE_POS):
                     pAction = player.abilities[0]
-                    #turn(player, rival, pAction)
-
+                    turn(player, rival, pAction)
                 if ABILITY2.checkForInput(MOUSE_POS):  
                     pAction = player.abilities[1]
-                    #turn(player, rival, pAction)
-
+                    turn(player, rival, pAction)
                 if ABILITY3.checkForInput(MOUSE_POS):
                     pAction = player.abilities[2]
-                    #turn(player, rival, pAction)
- 
+                    turn(player, rival, pAction)
                 if ABILITY4.checkForInput(MOUSE_POS):
                     pAction = player.abilities[3]
-                    #turn(player, rival, pAction)
+                    turn(player, rival, pAction)
 
                 if POTIONS.checkForInput(MOUSE_POS):
                     player.use_potion()
@@ -461,215 +487,199 @@ def battle():
                     pygame.display.update()
                     time.sleep(2)
                     if player.num_potions > 0:
-                        rivalturn(player,rival, playerBar)
+                        rivalturn(player,rival)
 
-        #if player.fainted == True:
-        #if rival.fainted == True:
+        if player.fainted == True:
+            if iP == 2:
+                END_TEXT = getFont(80).render('GAME OVER', True, "red")
+                END_RECT = END_TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+                SCREEN.blit(END_TEXT, END_RECT)
+                pygame.display.update()
+                time.sleep(3)
+                pygame.quit()
+                sys.exit()
+            DEF_TEXT = getFont(40).render('Your hero fainted, next one will enter the fight', True, "red")
+            DEF_RECT = DEF_TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+            SCREEN.blit(DEF_TEXT, DEF_RECT)
+            pygame.display.update()
+            time.sleep(1.5)
+            iP += 1
+            player = chosen[iP]
+                
+        if rival.fainted == True:
+            if iC == 2:
+                END_TEXT = getFont(80).render('VICTORY!', True, "red")
+                END_RECT = END_TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+                SCREEN.blit(END_TEXT, END_RECT)
+                pygame.display.update()
+                time.sleep(3)
+                pygame.quit()
+                sys.exit()
+            DEF_TEXT = getFont(40).render('Enemy defeaded, prepare for next one', True, "red")
+            DEF_RECT = DEF_TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+            SCREEN.blit(DEF_TEXT, DEF_RECT)
+            pygame.display.update()
+            time.sleep(1.5)
+            iC += 1
+            rival = enemies[iC]
+
         playerBar.updateBar(player,425,250)
         playerBar.drawRects()
         computerBar.drawRects()
         computerBar.updateBar(rival,1175,30)
         pygame.display.update()
 
-def rivalturn(player,rival,playerBar):
+def rivalturn(player,rival):
     rAction =  rival.abilities[random.randint(0,3)]
-    cAttack(rAction, player, rival)
+    Attack(rAction, player, rival)
     if player.current_hp <= 0:
         player.fainted = True
         return
 
-def turn(player, rival, pAction,playerBar,computerBar):
+def turn(player, rival, pAction):
     rAction =  rival.abilities[random.randint(0,3)]
+    if player.current_hp <= 0:
+        player.fainted = True
+        return
+    if rival.current_hp <= 0:
+        rival.fainted = True
+        return  
     if player.speed > rival.speed:
-        #pAttackSequence(pPokemon, pMove, cPokemon, pStats, cStats)
-        computerBar.updateBar(rival,1175,30)
-        computerBar.drawRects()
-        pygame.display.update()
-        if rival.current_hp <= 0:
-            rival.fainted = True
-            return
-        #cAttack(cPokemon, cMove, pPokemon, cStats, pStats)
-        playerBar.updateBar(player,425,250)
-        playerBar.drawRects()
-        pygame.display.update()
-    else:
-        #cAttack(cPokemon, cMove, pPokemon, cStats, pStats)
-        playerBar.updateBar(player,425,250)
-        playerBar.drawRects()
-        pygame.display.update()
+        Attack(pAction, rival, player)
         if player.current_hp <= 0:
             player.fainted = True
             return
-        #pAttackSequence(pPokemon, pMove, cPokemon, pStats, cStats)
-        computerBar.updateBar(rival,1175,30)
-        computerBar.drawRects()
-        pygame.display.update()
+        if rival.current_hp <= 0:
+            rival.fainted = True
+            return        
+        Attack(rAction, player, rival)
+        if player.current_hp <= 0:
+            player.fainted = True
+            return
+        if rival.current_hp <= 0:
+            rival.fainted = True
+            return          
+    else:
+        Attack(rAction, player, rival)       
+        if player.current_hp <= 0:
+            player.fainted = True
+            return
+        if rival.current_hp <= 0:
+            rival.fainted = True
+            return         
+        Attack(pAction, rival, player)
+        if player.current_hp <= 0:
+            player.fainted = True
+            return
+        if rival.current_hp <= 0:
+            rival.fainted = True
+            return          
 
-def cAttack(rAction, player, rival):
-    print(rival.name + " used " + rAction[4] + ".")
-    time.sleep(1)
-    mode = rAction[0]
+def Attack(Action, target, attacker):
+    SCREEN.fill(MENU_BASE_COLOR)
+    stringT = str(attacker.name) + " used " + str(Action[4])
+    TEXT = getFont(80).render(stringT, True, "red")
+    RECT = TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 4))
+    SCREEN.blit(TEXT, RECT)
+    pygame.display.update()
+    time.sleep(1.5)
+    TEXT = getFont(80).render(stringT, True, MENU_BASE_COLOR)
+    SCREEN.blit(TEXT, RECT)
+    pygame.display.update()
+    mode = Action[0]
     if mode == "1":
-        DamageMod(rival, rAction, player)
+        DamageMod(attacker, Action, target, False)
+    if mode == "2":
+        DamageMod(attacker, Action, target, True)
     elif mode == "21":
-        StatMod(rAction, rival)
+        StatMod(Action, attacker)
     elif mode == "22":
-        StatMod(rAction, player)
+        StatMod(Action, target)
 
-def DamageMod(attacker, attack, target):
+def DamageMod(attacker, attack, target, isDrain):
+    SCREEN.fill(MENU_BASE_COLOR)
     DMG = int(attack[1])
     aATK = attacker.attack
     tDEF = target.defense
     effect = DMG*(aATK/tDEF) #Calculate actual damage effect
     target.current_hp = target.current_hp - round(effect)
-    print(attacker.name + " dealt", effect, "damage!")
+
+    stringT = str(attacker.name) + " dealt " + str(round(effect)) + " damage!"
+    TEXT = getFont(80).render(stringT, True, "red")
+    RECT = TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 1.5))
+    SCREEN.blit(TEXT, RECT)
+    pygame.display.update()
+    time.sleep(1.5)
+    TEXT = getFont(80).render(stringT, True, MENU_BASE_COLOR)
+    SCREEN.blit(TEXT, RECT)
+    pygame.display.update()
+    if isDrain == True:
+        heal = round(effect) * 0.3
+        attacker.current_hp = attacker.current_hp + round(heal)
+        stringT = str(attacker.name) + " drained " + str(round(effect)) + "HP from target", 
+        TEXT = getFont(40).render(stringT, True, "red")
+        RECT = TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 1.5))
+        SCREEN.blit(TEXT, RECT)
+        pygame.display.update()
+        time.sleep(1.5)
+        TEXT = getFont(40).render(stringT, True, MENU_BASE_COLOR)
+        SCREEN.blit(TEXT, RECT)
+        pygame.display.update()
     return 
 
 def StatMod(ability, target):
+    SCREEN.fill(MENU_BASE_COLOR)
     targetStat = ability[3]
     effect = ability[2]
     if targetStat == "A": #If target stat is attack
         if effect == "-":
             target.attack -= 1 #target's attack is lowered
-            print(target.name + "'s" + " Attack fell.")
+            stringT = str(target.name) + "'s Attack fell."
+            TEXT = getFont(80).render(stringT, True, "red")
+            RECT = TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 1.5))
+            SCREEN.blit(TEXT, RECT)
+            pygame.display.update()
+            time.sleep(1.5)
+            TEXT = getFont(80).render(stringT, True, MENU_BASE_COLOR)
+            SCREEN.blit(TEXT, RECT)
+            pygame.display.update()
             return 
         else:
             target.attack += 1 #target's atack is raised
-            print(target.name  + "'s" + " Attack rose.")
+            stringT = str(target.name) + "'s Attack rose."
+            TEXT = getFont(80).render(stringT, True, "red")
+            RECT = TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 1.5))
+            SCREEN.blit(TEXT, RECT)
+            pygame.display.update()
+            time.sleep(1.5)
+            TEXT = getFont(80).render(stringT, True, MENU_BASE_COLOR)
+            SCREEN.blit(TEXT, RECT)
+            pygame.display.update()  
             return 
     else: 
         if effect == "-": 
             target.defense -= 1 #target's defense is lowered
-            print(target.name  + "'s" + " Defense fell.")
+            stringT = str(target.name) + "'s Defense fell."
+            TEXT = getFont(80).render(stringT, True, "red")
+            RECT = TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 1.5))
+            SCREEN.blit(TEXT, RECT)
+            pygame.display.update()
+            time.sleep(1.5)
+            TEXT = getFont(80).render(stringT, True, MENU_BASE_COLOR)
+            SCREEN.blit(TEXT, RECT)
+            pygame.display.update()
             return 
         else: 
             target.defense += 1 #target's defense is raised
-            print(target.name  + "'s" + " Defense rose.")
+            stringT = str(target.name) + "'s Defense rose."
+            TEXT = getFont(80).render(stringT, True, "red")
+            RECT = TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 1.5))
+            SCREEN.blit(TEXT, RECT)
+            pygame.display.update()
+            time.sleep(1.5)
+            TEXT = getFont(80).render(stringT, True, MENU_BASE_COLOR)
+            SCREEN.blit(TEXT, RECT)
+            pygame.display.update()    
             return 
 
 main_menu()
-
-'''
-while fainted != True:
-    #Executing the move selection functions for both the player and the computer
-    pMove = pMoveSelect(pMoveList)
-    cMove = cMoveSelect(cMoveList)
-    
-    #If player stat is faster, player attack sequence executes before computer
-    #attack sequence. Else, computer attack sequence attacks first.
-    if pPokemon[2] < cPokemon[2]:
-      #Execute attack sequence for player
-      pAttackSequence(pPokemon, pMove, cPokemon, pStats, cStats)
-      #Update the health bar if any changes have occured
-      computerBar.updateBar(cPokemon)
-      computerBar.drawRects()
-      pygame.display.update()
-      #Checking to see if computer pokemon has fainted. If so, winner is player
-      if cPokemon[1] <= 0:
-        fainted = True
-        winner = "Player"
-        break #break loop to end program
-      cAttackSequence(cPokemon, cMove, pPokemon, cStats, pStats)
-      playerBar.updateBar(pPokemon)
-      playerBar.drawRects()
-      pygame.display.update()
-      if pPokemon[1] <= 0:
-        fainted = True
-        winner = "Computer"
-        break
-    else:
-      cAttackSequence(cPokemon, cMove, pPokemon, cStats, pStats)
-      playerBar.updateBar(pPokemon)
-      playerBar.drawRects()
-      pygame.display.update()
-      if pPokemon[1] <= 0:
-        fainted = True
-        winner = "Computer"
-        break
-      pAttackSequence(pPokemon, pMove, cPokemon, pStats, cStats)
-      computerBar.updateBar(cPokemon)
-      computerBar.drawRects()
-      pygame.display.update()
-      if cPokemon[1] <= 0:
-        fainted = True
-        winner = "Player"
-        break
-    redraw()
-  #If the player won, player pokemon is displayed on the victory screen
-  if winner == "Player":
-    DISPLAYSURF.blit(endBackground,(0,0))
-    DISPLAYSURF.blit(playerImgList[0],(100,375))
-    drawText("The winner is "+pPokemon[0]+ "!", font, TEXTSURF, 120, 100, BLACK)
-    pygame.display.update()
-    time.sleep(2)
-  #If the computer won, computer pokemon is displayed on the victory screen
-  else:
-    DISPLAYSURF.blit(endBackground,(0,0))
-    DISPLAYSURF.blit(computerImgList[0],(100,375))
-    drawText("The winner is "+cPokemon[0]+ "!", font, TEXTSURF, 120, 100, BLACK)
-    pygame.display.update()
-    time.sleep(2)
-'''
-
-
-
-'''
-def pAttackSequence(pPokemon, pMove, cPokemon, pStats, cStats):
-#Function for applying the series of steps in the player attack sequence. Function
-#simply decides which move function to apply based on the mode of attack being used.
-#Mode 1 is a damage attack, 21 is a stat mod aimed at self, 22 is a stat mod aimed 
-#at a target.
-  DISPLAYSURF.blit(background, (0,0))
-  displayMessage(pPokemon[0] + " used " + pMove[5])
-  time.sleep(1)
-  mode = pMove[0]
-  if mode == "1":
-    cPokemon = DamageMod(pPokemon, pMove, cPokemon, pStats, cStats)
-  elif mode == "21":
-    pStats = StatMod(pMove, pStats, pPokemon[0])
-  elif mode == "22":
-    cStats = StatMod(pMove, cStats, cPokemon[0])
-
-
-    
-def DamageMod(attacker, attack, target, attackerStats, targetStats):
-#Function for handling calculating and applying damge to a target. 
-  typeAdvantage = AdvantageCalc(attack, target) #Determine type advantage
-  #Get values for calculation from stat lists
-  DMG = int(attack[2])
-  aATK = StatIndex(attackerStats, "A")
-  tDEF = StatIndex(targetStats, "D")
-  effect = DMG*(aATK/tDEF)*typeAdvantage #Calculate actual damage effect
-  target[1] = int(target[1]) - effect #apply effect to the stat list for the target pokemon
-  print (attacker[0] + " dealt", effect, "damage!")
-  print ("")
-  #Return the stat list containing the new value for health after application of 
-  #damage effect.
-  return target
-  
-def StatMod(move, targetStats, defenderName):
-#Function for handling stat modifying attacks. This function takes the target 
-#stat list and the move stats as parameters. Depending on the values in the move
-#list, the function applies a specific effect for modifying the stats of the target.
-  targetStat = move[4]
-  effect = move[3]
-  if targetStat == "A": #If target stat is attack...
-    if effect == "-": #And the effect is negative...
-      targetStats[0] -= 1 #target's attack is lowered
-      displayMessage(defenderName + "'s" + " Attack fell.")
-      return targetStats
-    else: #and the ffect is positive... 
-      targetStats[0] += 1 #target's atack is raised
-      displayMessage(defenderName + "'s" + " Attack rose.")
-      return targetStats
-  else: #if target stat is defense...
-    if effect == "-": #and effect is negative...
-      targetStats[1] -= 1 #target's defense is lowered
-      displayMessage(defenderName + "'s" + " Defense fell.")
-      return targetStats
-    else: #and the effect is positive...
-      targetStats[1] += 1 #target's defense is raised
-      displayMessage(defenderName + "'s" + " Defense rose.")
-      #Function returns the new stat levels for the target pokemon
-      return targetStats
-'''

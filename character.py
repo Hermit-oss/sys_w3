@@ -9,11 +9,10 @@ MENU_BASE_COLOR = (180, 150, 100)
 
 class Character():
 	instances = []
-	def __init__(self, faction, name, fullname, classc, hp, attack, defense, speed, Cdescr1, Cdescr2):
+	def __init__(self, faction, image, name, fullname, classc, hp, attack, defense, speed, Cdescr1, Cdescr2):
 		self.faction = faction
 		# sprites
-		self.image_front = pygame.image.load(os.path.join("assets", "img", "tmp_char.png"))
-       # self.image_back = image_back
+		self.image = pygame.image.load(os.path.join("assets", "img", image))
 		self.name = name
 		self.fullname = fullname
 		self.classc = classc
@@ -97,12 +96,12 @@ class Character():
 		surface.blit(ab3, (width // 2.75, height // 1.4))
 		surface.blit(ab4, (width // 2.75, height // 1.3))	
 
-		sprite = pygame.transform.scale(self.image_front, (200, 200))
+		sprite = pygame.transform.scale(self.image, (200, 200))
 		sprite_rect = sprite.get_rect(center=(width // 2.35, height // 3.8))
 		surface.blit(sprite, sprite_rect)
 
 	def select_list(self, surface, x, y): 
-		spriteS = pygame.transform.scale(self.image_front, (100, 100))
+		spriteS = pygame.transform.scale(self.image, (100, 100))
 		spriteS_rect = spriteS.get_rect(center=(x, y))
 		surface.blit(spriteS, spriteS_rect)
 		font = pygame.font.Font(os.path.join("assets", "font", "Bitmgothic.ttf"), 30)
@@ -123,30 +122,30 @@ class Character():
             # decrease the number of potions left
 			self.num_potions -= 1
 
-Valeria = Character(faction=1,name="Valeria",fullname="Valeria Bloodthorn",classc="Assassin",hp=30, attack=50, defense=40, speed=20,
-Cdescr1="Resourceful, opportunistic, and skilled in stealth and infiltration,", Cdescr2="using their abilities to gather intelligence and strike with precision.")
-Damien = Character(faction=1,name="Damien",fullname="Damien Darkbane",classc="Cleric",hp=35, attack=40, defense=30, speed=30,
-Cdescr1="Zealous, fervent, and unwavering in their faith, using", Cdescr2="their divine powers to protect their comrades and spread their beliefs.")
-Draven = Character(faction=1,name="Draven",fullname="Draven Bloodthorn",classc="Warrior",hp=25, attack=40, defense=20, speed=40,
-Cdescr1="Fearless, tenacious, and driven by a sense of duty,", Cdescr2="always at the forefront of battle, protecting their allies and pushing forward.")
-Lilith = Character(faction=1,name="Lilith",fullname="Lilith Shadowfire",classc="Mage",hp=30, attack=50, defense=40, speed=20,
-Cdescr1="Ambitious, determined, and willing to push the boundaries of magic, utilizing", Cdescr2="their arcane powers to achieve their goals and further their knowledge.")
-Viktor = Character(faction=1,name="Viktor",fullname="Viktor Blackthorn",classc="Paladin",hp=35, attack=40, defense=30, speed=30,
-Cdescr1="Resolute, unyielding, and unwavering in their convictions, fighting", Cdescr2="for what they believe is right, even if it means making tough choices.")
+Valeria = Character(faction=1,image="Valeria.png",name="Valeria",fullname="Valeria Bloodthorn",classc="Assassin",hp=30, attack=50, defense=40, speed=20,
+Cdescr1="Resourceful, opportunistic, and skilled in stealth and", Cdescr2="infiltration, using their abilities to strike with precision.")
+Damien = Character(faction=1,image="Damien.png",name="Damien",fullname="Damien Darkbane",classc="Cleric",hp=35, attack=40, defense=30, speed=30,
+Cdescr1="Zealous, fervent, and unwavering in their faith, using their", Cdescr2="divine powers to protect their comrades and spread their beliefs.")
+Draven = Character(faction=1,image="Draven.png",name="Draven",fullname="Draven Bloodthorn",classc="Warrior",hp=25, attack=40, defense=20, speed=40,
+Cdescr1="Fearless, tenacious, and driven by a sense of duty, always at the", Cdescr2="forefront of battle, protecting their allies and pushing forward.")
+Lilith = Character(faction=1,image="Lilith.png",name="Lilith",fullname="Lilith Shadowfire",classc="Mage",hp=30, attack=50, defense=40, speed=20,
+Cdescr1="Ambitious and willing to push the boundaries of magic,", Cdescr2="utilizing their arcane powers to achieve their goals")
+Viktor = Character(faction=1,image="Viktor.png",name="Viktor",fullname="Viktor Blackthorn",classc="Paladin",hp=35, attack=40, defense=30, speed=30,
+Cdescr1="Resolute, unyielding, and unwavering in their convictions,", Cdescr2="fighting for what they believe is right")
 Valeria.set_abilities()
 Damien.set_abilities()
 Draven.set_abilities()
 Lilith.set_abilities()
 Viktor.set_abilities()
-Luna = Character(faction=2,name="Luna",fullname="Luna Shadowbane",classc="Assassin",hp=30, attack=50, defense=40, speed=20,
+Luna = Character(faction=2,image="Luna.png",name="Luna",fullname="Luna Shadowbane",classc="Assassin",hp=30, attack=50, defense=40, speed=20,
 Cdescr1="Lethal, cunning, and secretive, with a penchant for stealth", Cdescr2="and subterfuge.")
-Seraphina = Character(faction=2,name="Seraphina",fullname="Seraphina Lightbringer",classc="Cleric",hp=35, attack=40, defense=30, speed=30,
+Seraphina = Character(faction=2,image="Seraphina.png",name="Seraphina",fullname="Seraphina Lightbringer",classc="Cleric",hp=35, attack=40, defense=30, speed=30,
 Cdescr1="Devout, compassionate, and wise, with a strong connection", Cdescr2="to the divine and a healing touch.")
-Magnus = Character(faction=2,name="Magnus",fullname="Magnus Ironfoot",classc="Warrior",hp=25, attack=40, defense=20, speed=40,
-Cdescr1="Brave, honorable, and skilled in combat, always ready to defend their allies and uphold justice.", Cdescr2="")
-Aurora = Character(faction=2,name="Aurora",fullname="Aurora Starweaver",classc="Mage",hp=30, attack=50, defense=40, speed=20,
-Cdescr1="Knowledgeable, arcane, and mysterious, with mastery over spells and the elements.", Cdescr2="")
-Alistair = Character(faction=2,name="Alistair",fullname="Alistair Dawnhammer",classc="Paladin",hp=35, attack=40, defense=30, speed=30,
+Magnus = Character(faction=2,image="Magnus.png",name="Magnus",fullname="Magnus Ironfoot",classc="Warrior",hp=25, attack=40, defense=20, speed=40,
+Cdescr1="Brave, honorable, and skilled in combat, always ready to defend", Cdescr2="their allies and uphold justice.")
+Aurora = Character(faction=2,image="Aurora.png",name="Aurora",fullname="Aurora Starweaver",classc="Mage",hp=30, attack=50, defense=40, speed=20,
+Cdescr1="Knowledgeable, arcane, and mysterious, with mastery over spells", Cdescr2="and the elements.")
+Alistair = Character(faction=2,image="Alistair.png",name="Alistair",fullname="Alistair Dawnhammer",classc="Paladin",hp=35, attack=40, defense=30, speed=30,
 Cdescr1="Righteous, valiant, and dedicated to their code of honor,", Cdescr2="with unwavering faith in their cause.")
 Luna.set_abilities()
 Seraphina.set_abilities()
