@@ -1,0 +1,6 @@
+22
+*
+-
+D
+Stun
+An ability that temporarily stuns the target, rendering them unable to take actions for a short time.

@@ -1,0 +1,6 @@
+1
+10
+*
+*
+Shadow Strike
+The assassin melds into the shadows, becoming invisible and strikes a critical blow to a target, dealing high damage.
