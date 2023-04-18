@@ -656,7 +656,7 @@ def StatMod(ability, target):
             SCREEN.blit(TEXT, RECT)
             pygame.display.update()  
             return 
-    else: 
+    elif targetStat == "D": #If target stat is defense
         if effect == "-": 
             target.defense -= 1 #target's defense is lowered
             stringT = str(target.name) + "'s Defense fell."
@@ -672,6 +672,31 @@ def StatMod(ability, target):
         else: 
             target.defense += 1 #target's defense is raised
             stringT = str(target.name) + "'s Defense rose."
+            TEXT = getFont(80).render(stringT, True, "red")
+            RECT = TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 1.5))
+            SCREEN.blit(TEXT, RECT)
+            pygame.display.update()
+            time.sleep(1.5)
+            TEXT = getFont(80).render(stringT, True, MENU_BASE_COLOR)
+            SCREEN.blit(TEXT, RECT)
+            pygame.display.update()    
+            return 
+    else: #If target stat is speed (S)
+        if effect == "-": 
+            target.defense -= 1 #target's speed is lowered
+            stringT = str(target.name) + "'s Speed fell."
+            TEXT = getFont(80).render(stringT, True, "red")
+            RECT = TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 1.5))
+            SCREEN.blit(TEXT, RECT)
+            pygame.display.update()
+            time.sleep(1.5)
+            TEXT = getFont(80).render(stringT, True, MENU_BASE_COLOR)
+            SCREEN.blit(TEXT, RECT)
+            pygame.display.update()
+            return 
+        else: 
+            target.defense += 1 #target's speed is raised
+            stringT = str(target.name) + "'s Speed rose."
             TEXT = getFont(80).render(stringT, True, "red")
             RECT = TEXT.get_rect(center=(WIDTH // 2, HEIGHT // 1.5))
             SCREEN.blit(TEXT, RECT)

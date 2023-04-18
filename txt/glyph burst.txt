@@ -1,0 +1,6 @@
+1
+13
+*
+*
+Glyph Burst
+Magical explosion that burns the target

@@ -3,4 +3,4 @@
 *
 *
 Poisoned Blades
-The assassin coats their blades with a deadly poison, inflicting damage over time on their target.
+Quick, not so strong attack 

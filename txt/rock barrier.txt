@@ -1,0 +1,6 @@
+22
+*
+-
+S
+Rock Barrier
+Rocks appear, blocking the way  

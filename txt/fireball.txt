@@ -1,0 +1,6 @@
+1
+8
+*
+*
+Fireball
+The caster hurls a ball of fire at a target

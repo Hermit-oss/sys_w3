@@ -1,7 +1,7 @@
 21
 *
 +
-A
+S
 Vanish
-The assassin becomes intangible for a brief period, allowing them to evade attacks and move quickly.
+Ability that increase self speed
 

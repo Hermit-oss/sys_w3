@@ -1,4 +1,4 @@
-Shadow Strike
-Poisoned Blades
-Vanish
-Stun
+Shield
+Sharpen
+Hammer Drop
+Rock Barrier

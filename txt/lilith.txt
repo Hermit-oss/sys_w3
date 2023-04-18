@@ -1,4 +1,4 @@
-Shadow Strike
-Poisoned Blades
-Vanish
-Stun
+Life Drain
+Hex
+Fireball
+Poison Cloud

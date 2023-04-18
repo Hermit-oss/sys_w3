@@ -1,0 +1,6 @@
+2
+7
+*
+*
+Life Drain
+Heals the caster 30% of dealt damage

@@ -1,4 +1,4 @@
-Shadow Strike
-Poisoned Blades
+Purify
+Life Drain
+Fireball
 Vanish
-Stun

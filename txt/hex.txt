@@ -1,0 +1,6 @@
+22
+*
+-
+A
+Hex
+Spell that decrease enemy strentgh

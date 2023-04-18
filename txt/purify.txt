@@ -1,0 +1,6 @@
+1
+12
+*
+*
+Purify
+Cleric repels creatures with divine power

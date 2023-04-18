@@ -1,4 +1,4 @@
-Shadow Strike
-Poisoned Blades
-Vanish
-Stun
+Sharpen
+Life Drain
+Holy Armour
+Hex

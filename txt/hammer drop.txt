@@ -1,0 +1,6 @@
+1
+15
+*
+*
+Hammer Drop
+Target gets smashed with power

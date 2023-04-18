@@ -1,0 +1,6 @@
+1
+11
+*
+*
+Heavy Sword
+Causes huge physical damage

@@ -1,4 +1,4 @@
-Shadow Strike
-Poisoned Blades
-Vanish
-Stun
+Frost Nova
+Fireball
+Hex
+Glyph Burst
