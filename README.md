@@ -1,4 +1,4 @@
-# sys_w3
+# Please go to master branch to download fully working game
 To launch, type 'python main.py' in command prompt or terminal.
 Buttons in character selection part may not seem to work (probably the for loop's fault), but they do - try a few times.
 (Recommended clicking directly into center of the button)
