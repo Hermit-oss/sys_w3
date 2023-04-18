@@ -18,5 +18,5 @@ Player gain 3 potions, each restores 10 HP. When one potion is used, total numbe
 ## Class HealthBar 
 ### Functions drawRects and updateBar
 Draws rectangles in declared position on screen and updates them if character's HP change
-## Classes Button and TogglButton - inheritance
+## Classes Button and ToggleButton - inheritance
 Child class has additional flag toggled, which allows hovering color to stay when button is clicked
